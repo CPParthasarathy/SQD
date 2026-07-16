@@ -1,0 +1,17 @@
+﻿$ProjectRoot = "D:\OneDrive\SQD"
+$EvidenceDirectory = "$ProjectRoot\docs\evidence\logs\B1.3"
+$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$DoctorReport = "$EvidenceDirectory\B1.3_esp_idf_doctor_$Timestamp.txt"
+
+New-Item `
+    -ItemType Directory `
+    -Path $EvidenceDirectory `
+    -Force | Out-Null
+
+Get-Clipboard |
+    Set-Content `
+        -Path $DoctorReport `
+        -Encoding UTF8
+
+Get-Item $DoctorReport |
+    Select-Object FullName, Length, LastWriteTime

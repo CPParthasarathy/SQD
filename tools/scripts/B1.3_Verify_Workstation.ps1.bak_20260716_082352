@@ -1,0 +1,563 @@
+[CmdletBinding()]
+param(
+    [switch]$SkipBoardCheck
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+# Controlled B1.3 baseline
+$ProjectRoot = "D:\OneDrive\SQD"
+$MinimalProject = Join-Path $ProjectRoot "verification\b1_2_minimal"
+$EvidenceDirectory = Join-Path $ProjectRoot "docs\evidence\logs\B1.3"
+
+$IdfPath = "D:\esp\v6.0.2\esp-idf"
+$IdfToolsPath = Join-Path $env:USERPROFILE ".espressif"
+$PythonEnvPath = Join-Path $IdfToolsPath "python_env\idf6.0_py3.11_env"
+$EspPython = Join-Path $PythonEnvPath "Scripts\python.exe"
+$IdfScript = Join-Path $IdfPath "tools\idf.py"
+$IdfToolsScript = Join-Path $IdfPath "tools\idf_tools.py"
+
+$GitExe = "D:\Programs\Git\cmd\git.exe"
+$VsCodeExe = "D:\Programs\Microsoft VS Code\Code.exe"
+
+$RequiredIdfVersion = "6.0.2"
+$RequiredExtensionVersion = "2.1.0"
+
+New-Item -ItemType Directory -Path $EvidenceDirectory -Force | Out-Null
+
+$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$TranscriptPath = Join-Path $EvidenceDirectory "B1.3_onboarding_verification_$Timestamp.txt"
+$CsvPath = Join-Path $EvidenceDirectory "B1.3_onboarding_results_$Timestamp.csv"
+
+$script:Results = New-Object System.Collections.Generic.List[object]
+$TranscriptStarted = $false
+
+function Add-Result {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Check,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("PASS", "FAIL", "SKIP", "WARN")]
+        [string]$Result,
+
+        [Parameter(Mandatory)]
+        [string]$Details
+    )
+
+    $script:Results.Add([pscustomobject]@{
+        Timestamp = (Get-Date).ToString("s")
+        Check = $Check
+        Result = $Result
+        Details = $Details
+    })
+
+    $Color = switch ($Result) {
+        "PASS" { "Green" }
+        "FAIL" { "Red" }
+        "SKIP" { "Yellow" }
+        "WARN" { "Yellow" }
+    }
+
+    Write-Host "[$Result] $Check - $Details" -ForegroundColor $Color
+}
+
+function Invoke-Check {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Action
+    )
+
+    try {
+        $Details = & $Action
+
+        if ($null -eq $Details) {
+            $Details = "Completed successfully."
+        }
+
+        Add-Result -Check $Name -Result "PASS" -Details ([string]$Details)
+    }
+    catch {
+        Add-Result -Check $Name -Result "FAIL" -Details $_.Exception.Message
+    }
+}
+
+function Invoke-NativeCommand {
+    param(
+        [Parameter(Mandatory)]
+        [string]$FilePath,
+
+        [string[]]$Arguments = @(),
+
+        [string]$WorkingDirectory
+    )
+
+    if (-not (Test-Path -LiteralPath $FilePath -PathType Leaf)) {
+        throw "Executable not found: $FilePath"
+    }
+
+    $StdOutPath = [System.IO.Path]::GetTempFileName()
+    $StdErrPath = [System.IO.Path]::GetTempFileName()
+
+    try {
+        $StartParameters = @{
+            FilePath = $FilePath
+            ArgumentList = $Arguments
+            Wait = $true
+            PassThru = $true
+            NoNewWindow = $true
+            RedirectStandardOutput = $StdOutPath
+            RedirectStandardError = $StdErrPath
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+            $StartParameters.WorkingDirectory = $WorkingDirectory
+        }
+
+        $Process = Start-Process @StartParameters
+
+        $StdOut = ""
+        $StdErr = ""
+
+        if (Test-Path -LiteralPath $StdOutPath) {
+            $StdOut = (Get-Content -LiteralPath $StdOutPath -Raw -ErrorAction SilentlyContinue)
+        }
+
+        if (Test-Path -LiteralPath $StdErrPath) {
+            $StdErr = (Get-Content -LiteralPath $StdErrPath -Raw -ErrorAction SilentlyContinue)
+        }
+
+        $CombinedOutput = @($StdOut, $StdErr) |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            ForEach-Object { $_.Trim() }
+
+        $OutputText = ($CombinedOutput -join [Environment]::NewLine).Trim()
+
+        if ($Process.ExitCode -ne 0) {
+            if ([string]::IsNullOrWhiteSpace($OutputText)) {
+                $OutputText = "No output was produced."
+            }
+
+            throw "$FilePath exited with code $($Process.ExitCode). $OutputText"
+        }
+
+        return [pscustomobject]@{
+            ExitCode = $Process.ExitCode
+            Output = $OutputText
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $StdOutPath, $StdErrPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Resolve-IdfManagedTool {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ToolDirectory,
+
+        [Parameter(Mandatory)]
+        [string]$ExecutableName
+    )
+
+    $ToolRoot = Join-Path $IdfToolsPath "tools\$ToolDirectory"
+
+    if (-not (Test-Path -LiteralPath $ToolRoot -PathType Container)) {
+        throw "ESP-IDF managed-tool directory not found: $ToolRoot"
+    }
+
+    $Executable = Get-ChildItem `
+        -LiteralPath $ToolRoot `
+        -Filter "$ExecutableName.exe" `
+        -File `
+        -Recurse `
+        -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $Executable) {
+        throw "$ExecutableName.exe was not found under $ToolRoot"
+    }
+
+    return $Executable.FullName
+}
+
+function Get-FirstOutputLine {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Text
+    )
+
+    return ($Text -split "`r?`n" | Where-Object {
+        -not [string]::IsNullOrWhiteSpace($_)
+    } | Select-Object -First 1)
+}
+
+try {
+    Start-Transcript -Path $TranscriptPath -Force | Out-Null
+    $TranscriptStarted = $true
+
+    Write-Host "B1.3 workstation onboarding verification"
+    Write-Host "Timestamp:       $Timestamp"
+    Write-Host "Project root:    $ProjectRoot"
+    Write-Host "Minimal project: $MinimalProject"
+    Write-Host "ESP-IDF:         $IdfPath"
+    Write-Host "IDF tools:       $IdfToolsPath"
+    Write-Host ""
+
+    # Set a deterministic process-local ESP-IDF environment.
+    $env:IDF_PATH = $IdfPath
+    $env:IDF_TOOLS_PATH = $IdfToolsPath
+    $env:IDF_PYTHON_ENV_PATH = $PythonEnvPath
+
+    Invoke-Check -Name "Controlled directories" -Action {
+        $RequiredDirectories = @(
+            $ProjectRoot,
+            $MinimalProject,
+            $IdfPath,
+            $IdfToolsPath,
+            $PythonEnvPath,
+            $EvidenceDirectory
+        )
+
+        $Missing = $RequiredDirectories | Where-Object {
+            -not (Test-Path -LiteralPath $_ -PathType Container)
+        }
+
+        if ($Missing) {
+            throw "Missing directories: $($Missing -join ', ')"
+        }
+
+        return "All controlled directories exist."
+    }
+
+    Invoke-Check -Name "Controlled files" -Action {
+        $RequiredFiles = @(
+            $EspPython,
+            $IdfScript,
+            $IdfToolsScript,
+            $GitExe,
+            $VsCodeExe,
+            (Join-Path $MinimalProject "CMakeLists.txt"),
+            (Join-Path $MinimalProject "main\CMakeLists.txt"),
+            (Join-Path $MinimalProject "main\main.c"),
+            (Join-Path $MinimalProject ".vscode\settings.json"),
+            (Join-Path $MinimalProject ".vscode\launch.json"),
+            (Join-Path $MinimalProject ".vscode\c_cpp_properties.json"),
+            (Join-Path $ProjectRoot "docs\phase-b\B1.3_Developer_Setup_Guide.md"),
+            (Join-Path $ProjectRoot "docs\phase-b\B1.3_Onboarding_Checklist.md")
+        )
+
+        $Missing = $RequiredFiles | Where-Object {
+            -not (Test-Path -LiteralPath $_ -PathType Leaf)
+        }
+
+        if ($Missing) {
+            throw "Missing files: $($Missing -join ', ')"
+        }
+
+        return "All controlled files exist."
+    }
+
+    # Resolve tools explicitly. Do not depend on the global Windows PATH.
+    $CMakeExe = Resolve-IdfManagedTool -ToolDirectory "cmake" -ExecutableName "cmake"
+    $NinjaExe = Resolve-IdfManagedTool -ToolDirectory "ninja" -ExecutableName "ninja"
+    $XtensaGccExe = Resolve-IdfManagedTool -ToolDirectory "xtensa-esp-elf" -ExecutableName "xtensa-esp-elf-gcc"
+    $XtensaGdbExe = Resolve-IdfManagedTool -ToolDirectory "xtensa-esp-elf-gdb" -ExecutableName "xtensa-esp-elf-gdb"
+    $RiscvGdbExe = Resolve-IdfManagedTool -ToolDirectory "riscv32-esp-elf-gdb" -ExecutableName "riscv32-esp-elf-gdb"
+    $OpenOcdExe = Resolve-IdfManagedTool -ToolDirectory "openocd-esp32" -ExecutableName "openocd"
+
+    $OptionalToolExecutables = @()
+
+    foreach ($OptionalTool in @(
+        @{ Directory = "ccache"; Executable = "ccache" },
+        @{ Directory = "esp32ulp-elf"; Executable = "esp32ulp-elf-as" },
+        @{ Directory = "riscv32-esp-elf"; Executable = "riscv32-esp-elf-gcc" },
+        @{ Directory = "dfu-util"; Executable = "dfu-util" }
+    )) {
+        try {
+            $OptionalToolExecutables += Resolve-IdfManagedTool `
+                -ToolDirectory $OptionalTool.Directory `
+                -ExecutableName $OptionalTool.Executable
+        }
+        catch {
+            # Optional for this ESP32-S3 minimal build. idf_tools.py check below
+            # remains the authoritative required-tool check.
+        }
+    }
+
+    $PrependPaths = @(
+        (Split-Path -Parent $EspPython),
+        (Join-Path $IdfPath "tools"),
+        (Split-Path -Parent $GitExe),
+        (Split-Path -Parent $VsCodeExe),
+        (Split-Path -Parent $CMakeExe),
+        (Split-Path -Parent $NinjaExe),
+        (Split-Path -Parent $XtensaGccExe),
+        (Split-Path -Parent $XtensaGdbExe),
+        (Split-Path -Parent $RiscvGdbExe),
+        (Split-Path -Parent $OpenOcdExe)
+    )
+
+    $PrependPaths += $OptionalToolExecutables | ForEach-Object {
+        Split-Path -Parent $_
+    }
+
+    $CurrentPaths = $env:Path -split ";"
+
+    $env:Path = (($PrependPaths + $CurrentPaths) |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Select-Object -Unique) -join ";"
+
+    Invoke-Check -Name "ESP-IDF version" -Action {
+        $Result = Invoke-NativeCommand `
+            -FilePath $EspPython `
+            -Arguments @($IdfScript, "--version") `
+            -WorkingDirectory $MinimalProject
+
+        $EscapedVersion = [regex]::Escape($RequiredIdfVersion)
+
+        if ($Result.Output -notmatch "(?:ESP-IDF\s+)?v$EscapedVersion(?:\s|$)") {
+            throw "Expected ESP-IDF v$RequiredIdfVersion; detected '$($Result.Output)'."
+        }
+
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$IdfScript]"
+    }
+
+    Invoke-Check -Name "ESP-IDF managed tools" -Action {
+        $Result = Invoke-NativeCommand `
+            -FilePath $EspPython `
+            -Arguments @($IdfToolsScript, "check") `
+            -WorkingDirectory $IdfPath
+
+        if ($Result.Output -match "(?i)not found|not installed|missing") {
+            throw "idf_tools.py check reported a missing tool. $($Result.Output)"
+        }
+
+        return "idf_tools.py check completed successfully."
+    }
+
+    Invoke-Check -Name "Visual Studio Code" -Action {
+        $Result = Invoke-NativeCommand -FilePath $VsCodeExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$VsCodeExe]"
+    }
+
+    Invoke-Check -Name "Git" -Action {
+        $Result = Invoke-NativeCommand -FilePath $GitExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$GitExe]"
+    }
+
+    Invoke-Check -Name "Python" -Action {
+        $Result = Invoke-NativeCommand -FilePath $EspPython -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$EspPython]"
+    }
+
+    Invoke-Check -Name "CMake" -Action {
+        $Result = Invoke-NativeCommand -FilePath $CMakeExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$CMakeExe]"
+    }
+
+    Invoke-Check -Name "Ninja" -Action {
+        $Result = Invoke-NativeCommand -FilePath $NinjaExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$NinjaExe]"
+    }
+
+    Invoke-Check -Name "ESP32-S3 GCC" -Action {
+        $Result = Invoke-NativeCommand -FilePath $XtensaGccExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$XtensaGccExe]"
+    }
+
+    Invoke-Check -Name "ESP32-S3 GDB command" -Action {
+        $Result = Invoke-NativeCommand -FilePath $XtensaGdbExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$XtensaGdbExe]"
+    }
+
+    Invoke-Check -Name "RISC-V GDB command" -Action {
+        $Result = Invoke-NativeCommand -FilePath $RiscvGdbExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$RiscvGdbExe]"
+    }
+
+    Invoke-Check -Name "OpenOCD command" -Action {
+        $Result = Invoke-NativeCommand -FilePath $OpenOcdExe -Arguments @("--version")
+        return "$(Get-FirstOutputLine -Text $Result.Output) [$OpenOcdExe]"
+    }
+
+    Invoke-Check -Name "ESP-IDF VS Code extension" -Action {
+        $ExtensionRoot = Join-Path $env:USERPROFILE ".vscode\extensions"
+
+        $ExtensionDirectory = Get-ChildItem `
+            -LiteralPath $ExtensionRoot `
+            -Directory `
+            -Filter "espressif.esp-idf-extension-*" `
+            -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($null -eq $ExtensionDirectory) {
+            throw "ESP-IDF VS Code extension directory was not found under $ExtensionRoot"
+        }
+
+        $DetectedVersion = $ExtensionDirectory.Name -replace "^espressif\.esp-idf-extension-", ""
+
+        if ($DetectedVersion -ne $RequiredExtensionVersion) {
+            throw "Expected ESP-IDF extension $RequiredExtensionVersion; detected $DetectedVersion."
+        }
+
+        return "espressif.esp-idf-extension@$DetectedVersion"
+    }
+
+    Invoke-Check -Name "Minimal B1.2 project structure" -Action {
+        $RootCMake = Get-Content `
+            -LiteralPath (Join-Path $MinimalProject "CMakeLists.txt") `
+            -Raw
+
+        $MainCMake = Get-Content `
+            -LiteralPath (Join-Path $MinimalProject "main\CMakeLists.txt") `
+            -Raw
+
+        if ($RootCMake -notmatch "project\s*\(") {
+            throw "Root CMakeLists.txt does not contain a project() declaration."
+        }
+
+        if ($MainCMake -notmatch "idf_component_register") {
+            throw "main\CMakeLists.txt does not register an ESP-IDF component."
+        }
+
+        return $MinimalProject
+    }
+
+    if ($SkipBoardCheck) {
+        Add-Result `
+            -Check "Heltec serial interface" `
+            -Result "SKIP" `
+            -Details "Board check was explicitly skipped. Hardware acceptance remains open."
+    }
+    else {
+        Invoke-Check -Name "Heltec serial interface" -Action {
+            $Devices = Get-CimInstance Win32_PnPEntity |
+                Where-Object {
+                    $_.Name -match "\(COM\d+\)" -and
+                    $_.Name -match "(?i)CP210|Silicon Labs|USB.*Serial|JTAG.*Serial"
+                }
+
+            if (-not $Devices) {
+                throw "No CP210x or USB serial interface was detected. Connect the Heltec board using a data-capable USB cable."
+            }
+
+            return (($Devices | Select-Object -ExpandProperty Name) -join "; ")
+        }
+    }
+
+    Invoke-Check -Name "Clean ESP32-S3 project build" -Action {
+        $SdkconfigPath = Join-Path $MinimalProject "sdkconfig"
+        $BuildPath = Join-Path $MinimalProject "build"
+
+        $TargetIsEsp32S3 = $false
+
+        if (Test-Path -LiteralPath $SdkconfigPath -PathType Leaf) {
+            $SdkconfigContent = Get-Content -LiteralPath $SdkconfigPath -Raw
+            $TargetIsEsp32S3 = $SdkconfigContent -match 'CONFIG_IDF_TARGET="esp32s3"'
+        }
+
+        if (-not $TargetIsEsp32S3) {
+            $SetTargetResult = Invoke-NativeCommand `
+                -FilePath $EspPython `
+                -Arguments @($IdfScript, "set-target", "esp32s3") `
+                -WorkingDirectory $MinimalProject
+
+            Write-Host $SetTargetResult.Output
+        }
+
+        # Controlled clean: remove only the project's generated build directory.
+        if (Test-Path -LiteralPath $BuildPath -PathType Container) {
+            $ResolvedProject = [System.IO.Path]::GetFullPath($MinimalProject).TrimEnd("\")
+            $ResolvedBuild = [System.IO.Path]::GetFullPath($BuildPath).TrimEnd("\")
+
+            if (-not $ResolvedBuild.StartsWith(
+                $ResolvedProject + "\",
+                [System.StringComparison]::OrdinalIgnoreCase
+            )) {
+                throw "Refusing to delete build directory outside the minimal project: $ResolvedBuild"
+            }
+
+            Remove-Item -LiteralPath $BuildPath -Recurse -Force
+        }
+
+        $BuildResult = Invoke-NativeCommand `
+            -FilePath $EspPython `
+            -Arguments @($IdfScript, "build") `
+            -WorkingDirectory $MinimalProject
+
+        Write-Host $BuildResult.Output
+
+        $ApplicationBinaries = Get-ChildItem `
+            -LiteralPath $BuildPath `
+            -Filter "*.bin" `
+            -File `
+            -ErrorAction SilentlyContinue
+
+        $BootloaderBinary = Join-Path $BuildPath "bootloader\bootloader.bin"
+        $PartitionBinary = Join-Path $BuildPath "partition_table\partition-table.bin"
+        $CompileCommands = Join-Path $BuildPath "compile_commands.json"
+
+        if (-not $ApplicationBinaries) {
+            throw "No top-level application binary was generated under $BuildPath"
+        }
+
+        foreach ($RequiredOutput in @(
+            $BootloaderBinary,
+            $PartitionBinary,
+            $CompileCommands
+        )) {
+            if (-not (Test-Path -LiteralPath $RequiredOutput -PathType Leaf)) {
+                throw "Required build output was not generated: $RequiredOutput"
+            }
+        }
+
+        $ApplicationSummary = $ApplicationBinaries |
+            ForEach-Object {
+                "$($_.Name)=$($_.Length) bytes"
+            }
+
+        return "Clean ESP32-S3 build succeeded. $($ApplicationSummary -join ', ')"
+    }
+}
+finally {
+    $script:Results |
+        Export-Csv `
+            -LiteralPath $CsvPath `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+    $FailCount = @($script:Results | Where-Object Result -eq "FAIL").Count
+    $PassCount = @($script:Results | Where-Object Result -eq "PASS").Count
+    $SkipCount = @($script:Results | Where-Object Result -eq "SKIP").Count
+    $WarnCount = @($script:Results | Where-Object Result -eq "WARN").Count
+
+    Write-Host ""
+    Write-Host "Verification summary"
+    Write-Host "PASS: $PassCount"
+    Write-Host "FAIL: $FailCount"
+    Write-Host "SKIP: $SkipCount"
+    Write-Host "WARN: $WarnCount"
+    Write-Host "Transcript: $TranscriptPath"
+    Write-Host "CSV results: $CsvPath"
+
+    if ($TranscriptStarted) {
+        Stop-Transcript | Out-Null
+    }
+}
+
+$FinalFailCount = @($script:Results | Where-Object Result -eq "FAIL").Count
+
+if ($FinalFailCount -gt 0) {
+    Write-Host "B1.3 onboarding verification FAILED." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "B1.3 onboarding verification PASSED." -ForegroundColor Green
+exit 0

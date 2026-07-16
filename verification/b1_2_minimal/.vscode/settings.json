@@ -1,0 +1,12 @@
+{
+    "idf.customExtraVars":  {
+                                "IDF_PATH":  "D:\\esp\\v6.0.2\\esp-idf",
+                                "IDF_TOOLS_PATH":  "C:\\Users\\parth\\.espressif",
+                                "IDF_PYTHON_ENV_PATH":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env"
+                            },
+    "idf.extensionActivationMode":  "always",
+    "idf.portWin":  "detect",
+    "idf.monitorPort":  "",
+    "idf.openOcdDebugLevel": 2,
+    "idf.currentSetup": "D:\\esp\\v6.0.2\\esp-idf"
+}

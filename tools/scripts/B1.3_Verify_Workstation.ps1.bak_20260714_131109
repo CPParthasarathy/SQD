@@ -1,0 +1,384 @@
+﻿[CmdletBinding()]
+param(
+    [string]$ProjectRoot = "D:\OneDrive\SQD",
+    [string]$IdfPath = "D:\esp\v6.0.2\esp-idf",
+    [string]$RequiredIdfVersion = "6.0.2",
+    [string]$RequiredEspIdfExtensionVersion = "2.1.0",
+    [switch]$SkipBuild,
+    [switch]$SkipBoardCheck
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+$MinimalProject = Join-Path $ProjectRoot "verification\b1_2_minimal"
+$EvidenceDirectory = Join-Path $ProjectRoot "docs\evidence\logs\B1.3"
+$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$TranscriptPath = Join-Path $EvidenceDirectory "B1.3_onboarding_verification_$Timestamp.txt"
+$ResultPath = Join-Path $EvidenceDirectory "B1.3_onboarding_results_$Timestamp.csv"
+
+New-Item -ItemType Directory -Path $EvidenceDirectory -Force | Out-Null
+
+$Results = [System.Collections.Generic.List[object]]::new()
+$ScriptFailed = $false
+$TranscriptStarted = $false
+
+function Add-CheckResult {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Check,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("PASS", "FAIL", "WARN")]
+        [string]$Result,
+
+        [Parameter(Mandatory)]
+        [string]$Details
+    )
+
+    $Results.Add(
+        [PSCustomObject]@{
+            Check = $Check
+            Result = $Result
+            Details = $Details
+        }
+    )
+
+    $Prefix = switch ($Result) {
+        "PASS" { "[PASS]" }
+        "FAIL" { "[FAIL]" }
+        "WARN" { "[WARN]" }
+    }
+
+    Write-Host "$Prefix $Check - $Details"
+
+    if ($Result -eq "FAIL") {
+        $script:ScriptFailed = $true
+    }
+}
+
+function Invoke-Check {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Action
+    )
+
+    try {
+        $Details = & $Action
+
+        if ([string]::IsNullOrWhiteSpace([string]$Details)) {
+            $Details = "Check completed successfully."
+        }
+
+        Add-CheckResult -Check $Name -Result "PASS" -Details ([string]$Details)
+    }
+    catch {
+        Add-CheckResult `
+            -Check $Name `
+            -Result "FAIL" `
+            -Details $_.Exception.Message
+    }
+}
+
+function Get-ExternalCommandOutput {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Command,
+
+        [string[]]$Arguments = @()
+    )
+
+    $Output = & $Command @Arguments 2>&1
+    $ExitCode = $LASTEXITCODE
+
+    if ($ExitCode -ne 0) {
+        throw "$Command failed with exit code $ExitCode. Output: $($Output -join ' ')"
+    }
+
+    return ($Output -join [Environment]::NewLine).Trim()
+}
+
+try {
+    Start-Transcript -Path $TranscriptPath -Force | Out-Null
+    $TranscriptStarted = $true
+
+    Write-Host "B1.3 Workstation Verification"
+    Write-Host "Project root: $ProjectRoot"
+    Write-Host "ESP-IDF root: $IdfPath"
+    Write-Host "Minimal project: $MinimalProject"
+    Write-Host ""
+
+    Invoke-Check -Name "Windows host information" -Action {
+        $OS = Get-CimInstance Win32_OperatingSystem
+
+        if ($OS.OSArchitecture -ne "64-bit") {
+            throw "A 64-bit Windows host was expected; detected $($OS.OSArchitecture)."
+        }
+
+        return "$($OS.Caption), version $($OS.Version), $($OS.OSArchitecture)"
+    }
+
+    Invoke-Check -Name "Project root exists" -Action {
+        if (-not (Test-Path -LiteralPath $ProjectRoot -PathType Container)) {
+            throw "Project root does not exist: $ProjectRoot"
+        }
+
+        return $ProjectRoot
+    }
+
+    Invoke-Check -Name "ESP-IDF repository exists" -Action {
+        $RequiredFiles = @(
+            "export.ps1",
+            "install.ps1",
+            "CMakeLists.txt",
+            "tools\idf.py"
+        )
+
+        $MissingFiles = foreach ($RequiredFile in $RequiredFiles) {
+            $Candidate = Join-Path $IdfPath $RequiredFile
+
+            if (-not (Test-Path -LiteralPath $Candidate)) {
+                $RequiredFile
+            }
+        }
+
+        if ($MissingFiles) {
+            throw "Missing ESP-IDF files: $($MissingFiles -join ', ')"
+        }
+
+        return $IdfPath
+    }
+
+    Invoke-Check -Name "ESP-IDF Python environment exists" -Action {
+        $ExpectedPython = Join-Path `
+            $env:USERPROFILE `
+            ".espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe"
+
+        if (-not (Test-Path -LiteralPath $ExpectedPython)) {
+            throw "ESP-IDF Python environment not found: $ExpectedPython"
+        }
+
+        return $ExpectedPython
+    }
+
+    Invoke-Check -Name "ESP-IDF environment activation" -Action {
+        $ExportScript = Join-Path $IdfPath "export.ps1"
+
+        & $ExportScript
+
+        if ([string]::IsNullOrWhiteSpace($env:IDF_PATH)) {
+            throw "export.ps1 completed without defining IDF_PATH."
+        }
+
+        $ExpectedPath = (Resolve-Path $IdfPath).Path.TrimEnd("\")
+        $ActualPath = (Resolve-Path $env:IDF_PATH).Path.TrimEnd("\")
+
+        if ($ExpectedPath -ne $ActualPath) {
+            throw "Expected IDF_PATH '$ExpectedPath', but detected '$ActualPath'."
+        }
+
+        return "IDF_PATH=$env:IDF_PATH"
+    }
+
+    Invoke-Check -Name "ESP-IDF version" -Action {
+        $Output = Get-ExternalCommandOutput `
+            -Command "idf.py" `
+            -Arguments @("--version")
+
+        if ($Output -notmatch "ESP-IDF v$([regex]::Escape($RequiredIdfVersion))") {
+            throw "Expected ESP-IDF v$RequiredIdfVersion; detected '$Output'."
+        }
+
+        return $Output
+    }
+
+    $RequiredCommands = @(
+        @{ Name = "VS Code"; Command = "code"; Arguments = @("--version") },
+        @{ Name = "Git"; Command = "git"; Arguments = @("--version") },
+        @{ Name = "Python"; Command = "python"; Arguments = @("--version") },
+        @{ Name = "CMake"; Command = "cmake"; Arguments = @("--version") },
+        @{ Name = "Ninja"; Command = "ninja"; Arguments = @("--version") },
+        @{
+            Name = "ESP32-S3 GCC"
+            Command = "xtensa-esp-elf-gcc"
+            Arguments = @("--version")
+        },
+        @{
+            Name = "ESP32-S3 GDB"
+            Command = "xtensa-esp-elf-gdb"
+            Arguments = @("--version")
+        },
+        @{ Name = "OpenOCD"; Command = "openocd"; Arguments = @("--version") }
+    )
+
+    foreach ($Tool in $RequiredCommands) {
+        $ToolName = $Tool.Name
+        $ToolCommand = $Tool.Command
+        $ToolArguments = $Tool.Arguments
+
+        Invoke-Check -Name "$ToolName command" -Action {
+            $CommandInfo = Get-Command $ToolCommand -ErrorAction Stop
+            $Output = Get-ExternalCommandOutput `
+                -Command $ToolCommand `
+                -Arguments $ToolArguments
+
+            $FirstLine = $Output -split "`r?`n" |
+                Select-Object -First 1
+
+            return "$FirstLine [$($CommandInfo.Source)]"
+        }
+    }
+
+    Invoke-Check -Name "ESP-IDF VS Code extension" -Action {
+        $Extensions = Get-ExternalCommandOutput `
+            -Command "code" `
+            -Arguments @("--list-extensions", "--show-versions")
+
+        $ExpectedExtension = "espressif.esp-idf-extension@$RequiredEspIdfExtensionVersion"
+
+        $MatchingExtension = $Extensions -split "`r?`n" |
+            Where-Object {
+                $_.Trim() -eq $ExpectedExtension
+            } |
+            Select-Object -First 1
+
+        if (-not $MatchingExtension) {
+            throw "Required extension not found: $ExpectedExtension"
+        }
+
+        return $ExpectedExtension
+    }
+
+    Invoke-Check -Name "Minimal B1.2 project structure" -Action {
+        $RequiredProjectFiles = @(
+            "CMakeLists.txt",
+            "main\CMakeLists.txt",
+            "main\main.c"
+        )
+
+        $MissingProjectFiles = foreach ($RequiredFile in $RequiredProjectFiles) {
+            $Candidate = Join-Path $MinimalProject $RequiredFile
+
+            if (-not (Test-Path -LiteralPath $Candidate)) {
+                $RequiredFile
+            }
+        }
+
+        if ($MissingProjectFiles) {
+            throw "Missing B1.2 project files: $($MissingProjectFiles -join ', ')"
+        }
+
+        return $MinimalProject
+    }
+
+    if (-not $SkipBoardCheck) {
+        Invoke-Check -Name "Heltec serial interface" -Action {
+            $SerialDevices = Get-CimInstance Win32_PnPEntity |
+                Where-Object {
+                    $_.Name -match "CP210|Silicon Labs|USB Serial.*COM[0-9]+"
+                }
+
+            if (-not $SerialDevices) {
+                throw "No CP210x or USB serial interface was detected. Connect the Heltec board using a data-capable USB cable."
+            }
+
+            $DeviceNames = $SerialDevices |
+                ForEach-Object { $_.Name }
+
+            return ($DeviceNames -join "; ")
+        }
+    }
+    else {
+        Add-CheckResult `
+            -Check "Heltec serial interface" `
+            -Result "WARN" `
+            -Details "Board check was skipped by command-line option."
+    }
+
+    if (-not $SkipBuild) {
+        Invoke-Check -Name "Clean ESP32-S3 project build" -Action {
+            Push-Location $MinimalProject
+
+            try {
+                $SdkconfigPath = Join-Path $MinimalProject "sdkconfig"
+
+                if (-not (Test-Path -LiteralPath $SdkconfigPath)) {
+                    & idf.py set-target esp32s3
+
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "idf.py set-target esp32s3 failed."
+                    }
+                }
+
+                & idf.py fullclean
+
+                if ($LASTEXITCODE -ne 0) {
+                    throw "idf.py fullclean failed."
+                }
+
+                & idf.py build
+
+                if ($LASTEXITCODE -ne 0) {
+                    throw "idf.py build failed."
+                }
+
+                $ApplicationBinary = Join-Path `
+                    $MinimalProject `
+                    "build\b1_2_minimal.bin"
+
+                if (-not (Test-Path -LiteralPath $ApplicationBinary)) {
+                    throw "Application binary was not generated: $ApplicationBinary"
+                }
+
+                $Binary = Get-Item $ApplicationBinary
+
+                return "Generated $($Binary.FullName), $($Binary.Length) bytes"
+            }
+            finally {
+                Pop-Location
+            }
+        }
+    }
+    else {
+        Add-CheckResult `
+            -Check "Clean ESP32-S3 project build" `
+            -Result "WARN" `
+            -Details "Build check was skipped by command-line option."
+    }
+}
+catch {
+    Add-CheckResult `
+        -Check "Verification script execution" `
+        -Result "FAIL" `
+        -Details $_.Exception.Message
+}
+finally {
+    $Results |
+        Export-Csv `
+            -Path $ResultPath `
+            -NoTypeInformation `
+            -Encoding UTF8
+
+    if ($TranscriptStarted) {
+        Stop-Transcript | Out-Null
+    }
+}
+
+Write-Host ""
+Write-Host "Verification results:"
+$Results | Format-Table -AutoSize
+
+Write-Host ""
+Write-Host "Transcript: $TranscriptPath"
+Write-Host "CSV results: $ResultPath"
+
+if ($ScriptFailed) {
+    Write-Error "B1.3 onboarding verification FAILED."
+    exit 1
+}
+
+Write-Host "B1.3 onboarding verification PASSED."
+exit 0

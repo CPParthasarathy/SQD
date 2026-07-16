@@ -1,0 +1,29 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260714112110
+Username: PMAA\parth
+RunAs User: PMAA\parth
+Configuration Name: 
+Machine: PMAA (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process ID: 30672
+PSVersion: 5.1.26100.8737
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8737
+BuildVersion: 10.0.26100.8737
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is D:\OneDrive\SQD\docs\evidence\logs\B1.2\B1.2_clean_build_20260714_112110.txt
+PS D:\OneDrive\SQD\verification\b1_2_minimal> idf.py fullclean
+
+PS D:\OneDrive\SQD\verification\b1_2_minimal> idf.py build
+
+PS D:\OneDrive\SQD\verification\b1_2_minimal> $BuildResult = $LASTEXITCODE
+PS D:\OneDrive\SQD\verification\b1_2_minimal> Stop-Transcript
+**********************
+Windows PowerShell transcript end
+End time: 20260714112650
+**********************

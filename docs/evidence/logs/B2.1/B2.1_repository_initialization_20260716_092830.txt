@@ -1,0 +1,75 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260716092830
+Username: PMAA\parth
+RunAs User: PMAA\parth
+Configuration Name: 
+Machine: PMAA (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File D:\OneDrive\SQD\tools\scripts\B2.1_Initialize_Repository.ps1
+Process ID: 20728
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+B2.1 production repository initialization
+Repository root: D:\OneDrive\SQD
+ESP-IDF:         D:\esp\v6.0.2\esp-idf
+
+[PASS] Prerequisite paths - B1 workstation and repository root are available.
+[PASS] Repository directories - 20 controlled directories exist.
+[PASS] Top-level ESP-IDF project files - CMake, main component and configuration-profile placeholders exist.
+[PASS] Component responsibility baseline - 9 component boundaries documented.
+[PASS] Supporting-area baseline - 5 supporting areas documented.
+[PASS] Repository ignore baseline - .gitignore and .gitattributes baselines installed.
+[PASS] Repository documentation baseline - README and B2.1 controlled baseline document exist.
+[PASS] Git repository initialization - Initialized empty Git repository in D:/OneDrive/SQD/.git/ Git repository initialized; branch baseline: main
+[PASS] Ignore-rule verification - Generated outputs and private-material paths are ignored; dependencies.lock is trackable.
+PS>TerminatingError(): "C:\Users\parth\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe exited with code 2."
+>> TerminatingError(): "C:\Users\parth\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe exited with code 2."
+[FAIL] Production-root ESP32-S3 build - C:\Users\parth\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe exited with code 2.
+[PASS] Repository tree evidence - Repository tree captured: D:\OneDrive\SQD\docs\evidence\logs\B2.1\B2.1_repository_tree_20260716_092830.txt
+
+Git status:
+?? .gitattributes
+?? .github/
+?? .gitignore
+?? .vscode/
+?? CMakeLists.txt
+?? ESP32_S3_SQD_Project_WBS.xlsx
+?? Phase_A_Industrial_Documentation_Handbook.md
+?? README.md
+?? VALIDATION_REPORT.md
+?? components/
+?? docs/
+?? factory/
+?? main/
+?? manifest.json
+?? partitions/
+?? prototypes/
+?? recovery/
+?? sdkconfig.defaults
+?? sdkconfig.defaults.debug
+?? sdkconfig.defaults.production
+?? sdkconfig.defaults.validation
+?? test_apps/
+?? tools/
+?? verification/
+[PASS] Git status capture - Git status captured. Review and create the B2.1 baseline commit.
+
+B2.1 initialization summary
+PASS: 11
+FAIL: 1
+SKIP: 0
+WARN: 0
+Transcript: D:\OneDrive\SQD\docs\evidence\logs\B2.1\B2.1_repository_initialization_20260716_092830.txt
+CSV:        D:\OneDrive\SQD\docs\evidence\logs\B2.1\B2.1_repository_initialization_20260716_092830.csv
+Tree:       D:\OneDrive\SQD\docs\evidence\logs\B2.1\B2.1_repository_tree_20260716_092830.txt
+**********************
+Windows PowerShell transcript end
+End time: 20260716092834
+**********************

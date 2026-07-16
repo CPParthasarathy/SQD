@@ -1,0 +1,43 @@
+﻿{
+    "schema_version":  "1.0",
+    "generated_utc":  "2026-07-14T09:05:12.1967107Z",
+    "workstation":  {
+                        "computer_name":  "PMAA",
+                        "operating_system":  "Microsoft Windows 11 Home Single Language",
+                        "os_version":  "10.0.26200",
+                        "architecture":  "64-bit"
+                    },
+    "target":  {
+                   "board":  "Heltec WiFi LoRa 32 V3",
+                   "soc":  "ESP32-S3",
+                   "idf_target":  "esp32s3"
+               },
+    "baseline":  {
+                     "esp_idf_required":  "v5.5.4",
+                     "vscode_extension_required":  "2.1.0",
+                     "update_policy":  "manual-controlled"
+                 },
+    "paths":  {
+                  "project_root":  "D:\\OneDrive\\SQD",
+                  "esp_idf":  "D:\\esp\\v6.0.2\\esp-idf"
+              },
+    "tools":  {
+                  "vscode":  "1.127.0",
+                  "vscode_esp_idf_extension":  "espressif.esp-idf-extension@2.1.0",
+                  "git":  "git version 2.55.0.windows.2",
+                  "python":  "Python 3.11.15",
+                  "esp_idf":  "v1.0.3",
+                  "cmake":  "cmake version 4.0.3",
+                  "ninja":  "1.12.1",
+                  "esp32s3_gcc":  "xtensa-esp-elf-gcc.exe (crosstool-NG esp-15.2.0_20251204) 15.2.0",
+                  "esp32s3_gdb":  "GNU gdb (esp-gdb) 17.1_20260402",
+                  "openocd":  "Open On-Chip Debugger v0.12.0-esp32-20260424 (2026-04-24-15:13)"
+              },
+    "detected_serial_devices":  [
+                                    {
+                                        "Name":  "Silicon Labs CP210x USB to UART Bridge (COM3)",
+                                        "Manufacturer":  "Silicon Labs",
+                                        "DeviceID":  "USB\\VID_10C4\u0026PID_EA60\\0001"
+                                    }
+                                ]
+}

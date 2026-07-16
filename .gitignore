@@ -1,0 +1,52 @@
+# BEGIN B2.1 ESP-IDF REPOSITORY BASELINE
+# ESP-IDF generated build and configuration
+/build/
+/build-*/
+/**/build/
+/**/build-*/
+sdkconfig
+sdkconfig.old
+**/sdkconfig
+**/sdkconfig.old
+
+# IDF Component Manager download area
+managed_components/
+**/managed_components/
+
+# Python and test caches
+.pytest_cache/
+**/.pytest_cache/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+pytest_embedded_log/
+
+# IDE-generated state; controlled VS Code JSON files remain trackable
+.vscode/.browse.c_cpp.db*
+.vscode/ipch/
+.idea/
+.vs/
+
+# Generated release/package output
+/dist/
+/release/
+/artifacts/
+
+# Local credentials and private material
+.env
+.env.*
+/secrets/
+/credentials/
+/private_keys/
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# OS and temporary files
+Thumbs.db
+.DS_Store
+~$*
+*.tmp
+# END B2.1 ESP-IDF REPOSITORY BASELINE

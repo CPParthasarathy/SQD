@@ -1,0 +1,5 @@
+# services component
+
+Purpose: Reusable product-level services and background workers.
+
+This directory is reserved by B2.1. Add CMakeLists.txt, source files and public headers when implementation begins.
