@@ -1,0 +1,46 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260717102008
+Username: PMAA\parth
+RunAs User: PMAA\parth
+Configuration Name: 
+Machine: PMAA (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File D:\OneDrive\SQD\tools\scripts\B2.2_Verify_Governance.ps1
+Process ID: 19868
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+B2.2 source-control and versioning governance verification
+Repository: D:\OneDrive\SQD
+GitHub:     CPParthasarathy/SQD
+
+[PASS] Required B2.2 files - 11 required governance files exist.
+[PASS] Policy completeness - Branching, review, commit, merge, SemVer, release, hotfix and exception rules are explicit.
+[PASS] Semantic version source - 0.1.0-dev.0
+[PASS] Repository-local Git governance - commit.template=.gitmessage; pull.rebase=true; fetch.prune=true; core.autocrlf=false
+[PASS] Main and origin synchronization - main and origin/main: d2f1e0b0b5092f3a3cbaf35c5e598e1765f8fefe
+[PASS] Latest main commit convention - docs(governance): record B2.2 closure controls (#4)
+[PASS] Release-tag convention - No release tags exist yet; naming and annotation policy is ready.
+[PASS] Generated and sensitive paths untracked - Generated outputs and sensitive-material patterns are absent from tracked files.
+[PASS] GitHub repository merge settings - GitHub API omitted administrator merge fields; default branch is main and manual settings evidence exists: D:\OneDrive\SQD\docs\evidence\screenshots\B2.2\B2.2_merge_settings.png
+[PASS] GitHub main protection - GitHub reports main as protected; ruleset evidence exists: D:\OneDrive\SQD\docs\evidence\screenshots\B2.2\B2.2_main_protection_ruleset.png
+[PASS] Pull-request bootstrap evidence - cc63d917b2ac87f053c40ae72254b82e9aeb1c3e|docs(governance): define B2.2 source-control policy
+
+B2.2 governance verification summary
+PASS: 11
+FAIL: 0
+SKIP: 0
+WARN: 0
+Transcript: D:\OneDrive\SQD\docs\evidence\logs\B2.2\B2.2_governance_verification_20260717_102008.txt
+CSV:        D:\OneDrive\SQD\docs\evidence\logs\B2.2\B2.2_governance_results_20260717_102008.csv
+GitHub API: D:\OneDrive\SQD\docs\evidence\logs\B2.2\B2.2_GitHub_repository_settings_20260717_102008.json
+**********************
+Windows PowerShell transcript end
+End time: 20260717102012
+**********************
