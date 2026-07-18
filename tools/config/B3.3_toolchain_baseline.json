@@ -1,0 +1,31 @@
+{
+    "schema_version":  1,
+    "work_package":  "B3.3",
+    "control":  "toolchain-rejection",
+    "target":  "esp32s3",
+    "idf":  {
+                "path":  "D:\\esp\\v6.0.2\\esp-idf",
+                "version":  "ESP-IDF v6.0.2"
+            },
+    "python":  {
+                   "path":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                   "version":  "Python 3.11.15"
+               },
+    "cmake":  {
+                  "path":  "C:\\Users\\parth\\.espressif\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+                  "version":  "cmake version 4.0.3"
+              },
+    "ninja":  {
+                  "path":  "C:\\Users\\parth\\.espressif\\tools\\ninja\\1.12.1\\ninja.exe",
+                  "version":  "1.12.1"
+              },
+    "compiler":  {
+                     "command":  "xtensa-esp32s3-elf-gcc.exe",
+                     "path":  "C:\\Users\\parth\\.espressif\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+                     "version_pattern":  "crosstool-NG esp-15.2.0_20251204"
+                 },
+    "git":  {
+                "path":  "D:\\Programs\\Git\\cmd\\git.exe",
+                "version":  "git version 2.55.0.windows.2"
+            }
+}

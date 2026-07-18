@@ -1,0 +1,24 @@
+============================================================
+B3.3 FIRMWARE IMAGE-SIZE BUDGET
+============================================================
+Status:                       PASS
+Timestamp:                    2026-07-18T17:25:44.3262240+02:00
+Branch:                       feat/b3.3-reproducible-build-controls
+Commit:                       adba68544ee6c13bed6766bca12a2120c9d192dd
+Profile:                      production
+Project:                      sqd_firmware
+Application binary bytes:     124480
+Application binary budget:    163840
+Linked image total bytes:     124363
+Linked image budget:          163840
+Application partition bytes:  1048576
+Partition headroom bytes:     924096
+Minimum required headroom:    884736
+Partition usage percent:      11.87
+Checks:                       6
+Failures:                     0
+Comparison CSV:               D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_comparison_20260718_172327.csv
+Size report:                  D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_measurement_20260718_172327.json
+Result JSON:                  D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_result_20260718_172327.json
+
+B3.3 FIRMWARE IMAGE-SIZE BUDGET PASS

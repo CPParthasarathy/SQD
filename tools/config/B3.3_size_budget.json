@@ -1,0 +1,28 @@
+{
+    "schema_version":  1,
+    "work_package":  "B3.3",
+    "control":  "firmware-image-size-budget",
+    "profile":  "production",
+    "target":  "esp32s3",
+    "partition":  {
+                      "scheme":  "single-app",
+                      "application_offset":  "0x10000",
+                      "application_capacity_bytes":  1048576,
+                      "minimum_headroom_bytes":  884736
+                  },
+    "budgets":  {
+                    "application_binary_max_bytes":  163840,
+                    "linked_image_total_max_bytes":  163840
+                },
+    "reference_measurement":  {
+                                  "application_binary_bytes":  124480,
+                                  "linked_image_total_bytes":  124363,
+                                  "partition_usage_percent":  11.87,
+                                  "source_build":  "build/b3.3/production_repro_a"
+                              },
+    "rationale":  {
+                      "application_binary_growth_bytes":  39360,
+                      "application_binary_growth_percent":  31.62,
+                      "maximum_partition_usage_percent":  15.63
+                  }
+}

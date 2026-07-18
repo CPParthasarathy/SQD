@@ -1,0 +1,31 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "configuration-drift",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-18T17:23:15.6965409+02:00",
+    "repository":  {
+                       "root":  "D:\\OneDrive\\SQD",
+                       "branch":  "feat/b3.3-reproducible-build-controls",
+                       "commit":  "adba68544ee6c13bed6766bca12a2120c9d192dd",
+                       "commit_short":  "adba68544ee6"
+                   },
+    "baseline":  {
+                     "path":  "D:\\OneDrive\\SQD\\tools\\config\\B3.3_configuration_baseline.json",
+                     "schema_version":  1,
+                     "controlled_file_count":  4,
+                     "profile_count":  3
+                 },
+    "toolchain":  {
+                      "idf_path":  "D:\\esp\\v6.0.2\\esp-idf",
+                      "idf_version":  "ESP-IDF v6.0.2",
+                      "python":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                      "target":  "esp32s3",
+                      "source_date_epoch":  1784377123
+                  },
+    "verification":  {
+                         "check_count":  22,
+                         "pass_count":  22,
+                         "fail_count":  0,
+                         "comparison_csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_configuration_drift_comparison_20260718_172111.csv"
+                     }
+}

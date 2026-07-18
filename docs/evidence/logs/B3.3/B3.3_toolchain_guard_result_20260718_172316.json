@@ -1,0 +1,49 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "toolchain-guard",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-18T17:23:26.7019584+02:00",
+    "repository":  {
+                       "root":  "D:\\OneDrive\\SQD",
+                       "branch":  "feat/b3.3-reproducible-build-controls",
+                       "commit":  "adba68544ee6c13bed6766bca12a2120c9d192dd",
+                       "commit_short":  "adba68544ee6"
+                   },
+    "baseline":  {
+                     "path":  "D:\\OneDrive\\SQD\\tools\\config\\B3.3_toolchain_baseline.json",
+                     "schema_version":  1
+                 },
+    "approved_toolchain":  {
+                               "target":  "esp32s3",
+                               "idf":  {
+                                           "path":  "D:\\esp\\v6.0.2\\esp-idf",
+                                           "version":  "ESP-IDF v6.0.2"
+                                       },
+                               "python":  {
+                                              "path":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                                              "version":  "Python 3.11.15"
+                                          },
+                               "cmake":  {
+                                             "path":  "C:\\Users\\parth\\.espressif\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+                                             "version":  "cmake version 4.0.3"
+                                         },
+                               "ninja":  {
+                                             "path":  "C:\\Users\\parth\\.espressif\\tools\\ninja\\1.12.1\\ninja.exe",
+                                             "version":  "1.12.1"
+                                         },
+                               "compiler":  {
+                                                "path":  "C:\\Users\\parth\\.espressif\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+                                                "version":  "xtensa-esp-elf-gcc.exe (crosstool-NG esp-15.2.0_20251204) 15.2.0"
+                                            },
+                               "git":  {
+                                           "path":  "D:\\Programs\\Git\\cmd\\git.exe",
+                                           "version":  "git version 2.55.0.windows.2"
+                                       }
+                           },
+    "rejection_tests":  {
+                            "count":  8,
+                            "pass_count":  8,
+                            "fail_count":  0,
+                            "csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_toolchain_rejection_tests_20260718_172316.csv"
+                        }
+}

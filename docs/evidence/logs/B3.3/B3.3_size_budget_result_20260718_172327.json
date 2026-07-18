@@ -1,0 +1,55 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "firmware-image-size-budget",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-18T17:25:44.2746864+02:00",
+    "repository":  {
+                       "root":  "D:\\OneDrive\\SQD",
+                       "branch":  "feat/b3.3-reproducible-build-controls",
+                       "commit":  "adba68544ee6c13bed6766bca12a2120c9d192dd",
+                       "commit_short":  "adba68544ee6"
+                   },
+    "toolchain":  {
+                      "idf_path":  "D:\\esp\\v6.0.2\\esp-idf",
+                      "idf_version":  "ESP-IDF v6.0.2",
+                      "python":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                      "target":  "esp32s3",
+                      "source_date_epoch":  1784377123
+                  },
+    "baseline":  {
+                     "path":  "D:\\OneDrive\\SQD\\tools\\config\\B3.3_size_budget.json",
+                     "schema_version":  1,
+                     "profile":  "production"
+                 },
+    "measurement":  {
+                        "project":  "sqd_firmware",
+                        "build_directory":  "D:\\OneDrive\\SQD\\build\\b3.3\\production_size_budget",
+                        "application_binary":  "D:\\OneDrive\\SQD\\build\\b3.3\\production_size_budget\\sqd_firmware.bin",
+                        "application_binary_bytes":  124480,
+                        "application_binary_sha256":  "D4A177A76E098041311853F9E4DC6A2AC2E06DEEA433033E27DF099C86487ED3",
+                        "linked_image_total_bytes":  124363,
+                        "application_partition_capacity_bytes":  1048576,
+                        "application_partition_headroom_bytes":  924096,
+                        "application_partition_usage_percent":  11.87,
+                        "size_report":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_measurement_20260718_172327.json"
+                    },
+    "budgets":  {
+                    "application_binary_max_bytes":  163840,
+                    "linked_image_total_max_bytes":  163840,
+                    "minimum_partition_headroom_bytes":  884736
+                },
+    "verification":  {
+                         "check_count":  6,
+                         "pass_count":  6,
+                         "fail_count":  0,
+                         "comparison_csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_comparison_20260718_172327.csv"
+                     },
+    "execution":  {
+                      "build_duration_seconds":  125.138,
+                      "size_duration_seconds":  4.062,
+                      "build_stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_build_stdout_20260718_172327.txt",
+                      "build_stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_build_stderr_20260718_172327.txt",
+                      "size_stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_measurement_stdout_20260718_172327.txt",
+                      "size_stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_size_budget_measurement_stderr_20260718_172327.txt"
+                  }
+}

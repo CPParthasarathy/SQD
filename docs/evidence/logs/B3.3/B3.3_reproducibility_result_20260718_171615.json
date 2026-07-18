@@ -1,0 +1,37 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "reproducible-build",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-18T17:21:10.4035944+02:00",
+    "profile":  "production",
+    "repository":  {
+                       "branch":  "feat/b3.3-reproducible-build-controls",
+                       "commit":  "adba68544ee6c13bed6766bca12a2120c9d192dd",
+                       "tracked_tree_clean":  false
+                   },
+    "toolchain":  {
+                      "idf_path":  "D:\\esp\\v6.0.2\\esp-idf",
+                      "idf_version":  "ESP-IDF v6.0.2",
+                      "python":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                      "target":  "esp32s3",
+                      "source_date_epoch":  1784377123
+                  },
+    "build_a":  {
+                    "directory":  "D:\\OneDrive\\SQD\\build\\b3.3\\production_repro_a",
+                    "duration_seconds":  132.485,
+                    "sdkconfig_sha256":  "3132B8003A02020068FEECE30625281C714D5FFC5E576862DD3C1ABE63FA79F8"
+                },
+    "build_b":  {
+                    "directory":  "D:\\OneDrive\\SQD\\build\\b3.3\\production_repro_b",
+                    "duration_seconds":  149.92,
+                    "sdkconfig_sha256":  "3132B8003A02020068FEECE30625281C714D5FFC5E576862DD3C1ABE63FA79F8"
+                },
+    "comparison":  {
+                       "generated_configuration_match":  true,
+                       "flash_binary_count_a":  3,
+                       "flash_binary_count_b":  3,
+                       "flash_binary_set_match":  true,
+                       "mismatch_count":  0,
+                       "csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_reproducibility_comparison_20260718_171615.csv"
+                   }
+}

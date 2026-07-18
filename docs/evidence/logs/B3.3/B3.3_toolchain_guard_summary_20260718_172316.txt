@@ -1,0 +1,22 @@
+============================================================
+B3.3 TOOLCHAIN GUARD
+============================================================
+Status:                    PASS
+Timestamp:                 2026-07-18T17:23:26.7202455+02:00
+Branch:                    feat/b3.3-reproducible-build-controls
+Commit:                    adba68544ee6c13bed6766bca12a2120c9d192dd
+Target:                    esp32s3
+ESP-IDF:                   ESP-IDF v6.0.2
+ESP-IDF path:              D:\esp\v6.0.2\esp-idf
+Python:                    Python 3.11.15
+CMake:                     cmake version 4.0.3
+Ninja:                     1.12.1
+Compiler:                  xtensa-esp-elf-gcc.exe (crosstool-NG esp-15.2.0_20251204) 15.2.0
+Git:                       git version 2.55.0.windows.2
+Rejection tests:           8
+Rejected correctly:        8
+Rejection failures:        0
+Rejection CSV:             D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_toolchain_rejection_tests_20260718_172316.csv
+Result JSON:               D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_toolchain_guard_result_20260718_172316.json
+
+B3.3 TOOLCHAIN GUARD PASS

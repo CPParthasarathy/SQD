@@ -1,0 +1,14 @@
+
+============================================================
+B3.3 TOOLCHAIN GUARD
+============================================================
+
+============================================================
+B3.3 TOOLCHAIN GUARD PASS
+============================================================
+Approved toolchain: PASS
+Rejection tests:    8
+Rejection failures: 0
+Summary:            D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_toolchain_guard_summary_20260718_172316.txt
+Result JSON:        D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_toolchain_guard_result_20260718_172316.json
+Rejection CSV:      D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_toolchain_rejection_tests_20260718_172316.csv

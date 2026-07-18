@@ -1,0 +1,42 @@
+{
+    "schema_version":  1,
+    "work_package":  "B3.3",
+    "control":  "configuration-drift",
+    "target":  "esp32s3",
+    "hardware_compatibility":  "heltec-wifi-lora-32-v3",
+    "profiles":  [
+                     "debug",
+                     "validation",
+                     "production"
+                 ],
+    "generated_configuration":  {
+                                    "required":  [
+                                                     "CONFIG_IDF_TARGET=\"esp32s3\"",
+                                                     "CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y",
+                                                     "CONFIG_ESPTOOLPY_FLASHSIZE=\"8MB\"",
+                                                     "CONFIG_APP_REPRODUCIBLE_BUILD=y"
+                                                 ],
+                                    "forbidden_enabled":  [
+                                                              "CONFIG_APP_COMPILE_TIME_DATE=y",
+                                                              "CONFIG_BOOTLOADER_COMPILE_TIME_DATE=y"
+                                                          ]
+                                },
+    "controlled_files":  [
+                             {
+                                 "relative_path":  "sdkconfig.defaults",
+                                 "canonical_sha256":  "DD39E8CA716B18264662C73913C545449A33195059E5103765BB6371FEF0DE4B"
+                             },
+                             {
+                                 "relative_path":  "sdkconfig.defaults.debug",
+                                 "canonical_sha256":  "C9E2A2443DE38C282DE07FB007277243D0CB594F707D71D1CC952DDFC7A90233"
+                             },
+                             {
+                                 "relative_path":  "sdkconfig.defaults.validation",
+                                 "canonical_sha256":  "CDCD4EECE98ACB5346966799B48128D6426F46F88319FCDF6FDFEF99EC535743"
+                             },
+                             {
+                                 "relative_path":  "sdkconfig.defaults.production",
+                                 "canonical_sha256":  "E8B76AEA0CD3772F2BA29EDFEF6F07C3F36DD086042E5A9A787C8AD5A7F6E099"
+                             }
+                         ]
+}

@@ -1,0 +1,16 @@
+
+============================================================
+B3.3 FIRMWARE IMAGE-SIZE BUDGET
+============================================================
+
+============================================================
+B3.3 FIRMWARE IMAGE-SIZE BUDGET PASS
+============================================================
+Application binary: 124480 / 163840 bytes
+Linked image:       124363 / 163840 bytes
+Partition headroom: 924096 bytes
+Checks:             6
+Failures:           0
+Summary:            D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_summary_20260718_172327.txt
+Result JSON:        D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_result_20260718_172327.json
+Comparison CSV:     D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_comparison_20260718_172327.csv

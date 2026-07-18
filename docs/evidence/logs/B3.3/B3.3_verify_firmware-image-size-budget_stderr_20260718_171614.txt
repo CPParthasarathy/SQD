@@ -1,0 +1,8 @@
+Activating ESP-IDF 6.0
+Setting IDF_PATH to 'D:\esp\v6.0.2\esp-idf'.
+* Checking python version ... 3.11.15
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... powershell.exe
+* Detecting outdated tools in system ... OK - no outdated tools found

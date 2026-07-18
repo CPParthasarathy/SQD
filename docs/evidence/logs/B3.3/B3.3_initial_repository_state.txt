@@ -1,0 +1,5 @@
+B3.3 INITIAL REPOSITORY STATE
+Timestamp: 2026-07-18T14:45:27.7247441+02:00
+Branch: feat/b3.3-reproducible-build-controls
+Commit: adba68544ee6c13bed6766bca12a2120c9d192dd
+Working tree: CLEAN

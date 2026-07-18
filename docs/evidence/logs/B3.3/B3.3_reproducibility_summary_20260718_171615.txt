@@ -1,0 +1,16 @@
+B3.3 REPRODUCIBLE BUILD TEST
+Status: PASS
+Timestamp: 2026-07-18T17:21:10.4362442+02:00
+Profile: production
+Branch: feat/b3.3-reproducible-build-controls
+Commit: adba68544ee6c13bed6766bca12a2120c9d192dd
+ESP-IDF: ESP-IDF v6.0.2
+Python: C:\Users\parth\.espressif\python_env\idf6.0_py3.11_env\Scripts\python.exe
+SOURCE_DATE_EPOCH: 1784377123
+Configuration match: True
+Flash binary count A: 3
+Flash binary count B: 3
+Flash binary set match: True
+Binary mismatch count: 0
+Comparison CSV: D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_reproducibility_comparison_20260718_171615.csv
+Result JSON: D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_reproducibility_result_20260718_171615.json

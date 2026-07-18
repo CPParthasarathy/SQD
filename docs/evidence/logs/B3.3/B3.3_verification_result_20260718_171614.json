@@ -1,0 +1,125 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "consolidated-verification",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-18T17:25:44.5655045+02:00",
+    "repository":  {
+                       "root":  "D:\\OneDrive\\SQD",
+                       "branch":  "feat/b3.3-reproducible-build-controls",
+                       "commit":  "adba68544ee6c13bed6766bca12a2120c9d192dd",
+                       "commit_short":  "adba68544ee6",
+                       "tracked_status":  "M components/build_metadata/CMakeLists.txt\r\n M sdkconfig.defaults"
+                   },
+    "verification":  {
+                         "total_checks":  13,
+                         "pass_count":  13,
+                         "fail_count":  0,
+                         "result_csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verification_results_20260718_171614.csv"
+                     },
+    "checks":  [
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_Common.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_ConfigDrift.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_Reproducibility.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_SizeBudget.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_ToolchainGuard.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "script-syntax",
+                       "Check":  "B3.3_Verify.ps1",
+                       "Status":  "PASS",
+                       "Diagnostic":  "PowerShell syntax valid.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "baseline-json",
+                       "Check":  "B3.3_configuration_baseline.json",
+                       "Status":  "PASS",
+                       "Diagnostic":  "JSON parsed; schema version 1.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "baseline-json",
+                       "Check":  "B3.3_size_budget.json",
+                       "Status":  "PASS",
+                       "Diagnostic":  "JSON parsed; schema version 1.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "baseline-json",
+                       "Check":  "B3.3_toolchain_baseline.json",
+                       "Status":  "PASS",
+                       "Diagnostic":  "JSON parsed; schema version 1.",
+                       "Stdout":  "",
+                       "Stderr":  ""
+                   },
+                   {
+                       "Category":  "control-execution",
+                       "Check":  "reproducible-build",
+                       "Status":  "PASS",
+                       "Diagnostic":  "Completed in 295.833 seconds.",
+                       "Stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_reproducible-build_stdout_20260718_171614.txt",
+                       "Stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_reproducible-build_stderr_20260718_171614.txt"
+                   },
+                   {
+                       "Category":  "control-execution",
+                       "Check":  "configuration-drift",
+                       "Status":  "PASS",
+                       "Diagnostic":  "Completed in 125.154 seconds.",
+                       "Stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_configuration-drift_stdout_20260718_171614.txt",
+                       "Stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_configuration-drift_stderr_20260718_171614.txt"
+                   },
+                   {
+                       "Category":  "control-execution",
+                       "Check":  "toolchain-rejection",
+                       "Status":  "PASS",
+                       "Diagnostic":  "Completed in 11.135 seconds.",
+                       "Stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_toolchain-rejection_stdout_20260718_171614.txt",
+                       "Stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_toolchain-rejection_stderr_20260718_171614.txt"
+                   },
+                   {
+                       "Category":  "control-execution",
+                       "Check":  "firmware-image-size-budget",
+                       "Status":  "PASS",
+                       "Diagnostic":  "Completed in 137.41 seconds.",
+                       "Stdout":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_firmware-image-size-budget_stdout_20260718_171614.txt",
+                       "Stderr":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_verify_firmware-image-size-budget_stderr_20260718_171614.txt"
+                   }
+               ]
+}
