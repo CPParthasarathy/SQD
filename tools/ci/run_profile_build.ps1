@@ -49,14 +49,28 @@ function Invoke-B41Git {
             -ErrorAction Stop
     }
 
-    $Output = @(
-        & $GitCommand.Source `
-            -C $WorkingDirectory `
-            @Arguments `
-            2>&1
-    )
+    $PreviousErrorActionPreference = $ErrorActionPreference
 
-    $ExitCode = $LASTEXITCODE
+    try {
+        # Windows PowerShell 5.1 represents native stderr as an error
+        # record. Git writes successful progress messages such as
+        # "Preparing worktree" to stderr, so temporarily prevent those
+        # records from terminating the wrapper. The native exit code remains
+        # the authoritative success criterion below.
+        $ErrorActionPreference = "Continue"
+
+        $Output = @(
+            & $GitCommand.Source `
+                -C $WorkingDirectory `
+                @Arguments `
+                2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $PreviousErrorActionPreference
+    }
     $Text = ($Output -join [Environment]::NewLine).Trim()
 
     if (
@@ -126,17 +140,29 @@ function Invoke-B42ArchiveTool {
         }
     }
 
-    $Output = @(
-        & $PythonCommand.Source `
-            -B `
-            $ArchiveToolPath `
-            --contract `
-            $ArchiveContractPath `
-            @Arguments `
-            2>&1
-    )
+    $PreviousErrorActionPreference = $ErrorActionPreference
 
-    $ExitCode = $LASTEXITCODE
+    try {
+        # Preserve stderr as captured diagnostic output. Under Windows
+        # PowerShell 5.1, native stderr otherwise becomes a terminating error
+        # when the repository-wide preference is Stop.
+        $ErrorActionPreference = "Continue"
+
+        $Output = @(
+            & $PythonCommand.Source `
+                -B `
+                $ArchiveToolPath `
+                --contract `
+                $ArchiveContractPath `
+                @Arguments `
+                2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $PreviousErrorActionPreference
+    }
 
     if ($Output.Count -gt 0) {
         Write-Host (

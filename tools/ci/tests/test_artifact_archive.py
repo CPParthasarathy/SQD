@@ -14,6 +14,9 @@ from types import ModuleType
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ARCHIVE_PATH = REPO_ROOT / "tools" / "ci" / "artifact_archive.py"
 VERIFY_PATH = REPO_ROOT / "tools" / "ci" / "verify_b4_2.py"
+PROFILE_WRAPPER_PATH = (
+    REPO_ROOT / "tools" / "ci" / "run_profile_build.ps1"
+)
 CONTRACT_PATH = (
     REPO_ROOT / "tools" / "ci" / "artifact_archive_contract.json"
 )
@@ -49,6 +52,7 @@ class B42TextFileTests(unittest.TestCase):
             ARCHIVE_PATH,
             CONTRACT_PATH,
             VERIFY_PATH,
+            PROFILE_WRAPPER_PATH,
             RECORD_PATH,
             Path(__file__).resolve(),
         )
@@ -59,6 +63,34 @@ class B42TextFileTests(unittest.TestCase):
                 self.assertNotIn(b"\r", data)
                 self.assertTrue(data.endswith(b"\n"))
                 data.decode("utf-8")
+
+    def test_profile_wrapper_captures_native_stderr(self) -> None:
+        wrapper_text = PROFILE_WRAPPER_PATH.read_text(encoding="utf-8")
+        self.assertGreaterEqual(
+            wrapper_text.count(
+                "$PreviousErrorActionPreference = "
+                "$ErrorActionPreference"
+            ),
+            2,
+        )
+        self.assertGreaterEqual(
+            wrapper_text.count(
+                '$ErrorActionPreference = "Continue"'
+            ),
+            2,
+        )
+        self.assertGreaterEqual(
+            wrapper_text.count(
+                "$ErrorActionPreference = "
+                "$PreviousErrorActionPreference"
+            ),
+            2,
+        )
+        self.assertIn(
+            "The native exit code remains",
+            wrapper_text,
+        )
+
 
 
 class B42VerificationTests(unittest.TestCase):
