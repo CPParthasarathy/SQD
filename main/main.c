@@ -10,8 +10,7 @@
 
 static const char *TAG = "B1.2";
 
-void app_main(void)
-{
+void app_main(void) {
     uint32_t heartbeat = 0;
 
     ESP_LOGI(TAG, "B1.2 minimal firmware started");

@@ -1,0 +1,199 @@
+name: B4.1 Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: b4-1-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  IDF_VERSION: "v6.0.2"
+  IDF_COMMIT_PREFIX: "7101770"
+
+jobs:
+  quality:
+    name: Quality contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up controlled Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: tools/ci/requirements-ci.txt
+
+      - name: Install pinned CI tools
+        run: |
+          python -m pip install --disable-pip-version-check --requirement tools/ci/requirements-ci.txt
+          python -m pip check
+
+      - name: Validate workflow contract
+        run: python tools/ci/check_workflow.py
+
+      - name: Verify C and C++ formatting
+        run: python tools/ci/check_format.py
+
+      - name: Validate Clang-Tidy contract
+        run: python tools/ci/check_clang_tidy.py --config-only
+
+      - name: Run host tests
+        run: python tools/ci/run_host_tests.py
+
+  profile-build:
+    name: ESP-IDF ${{ matrix.profile }} profile
+    needs: quality
+    runs-on: windows-2022
+    timeout-minutes: 90
+
+    strategy:
+      fail-fast: false
+      matrix:
+        profile:
+          - debug
+          - validation
+          - production
+
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Restore ESP-IDF tool cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\espressif
+          key: esp-idf-${{ runner.os }}-${{ env.IDF_VERSION }}-python-${{ env.PYTHON_VERSION }}
+
+      - name: Acquire controlled ESP-IDF source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $IdfPath = Join-Path $env:RUNNER_TEMP "esp-idf-v6.0.2"
+          $IdfToolsPath = Join-Path $env:RUNNER_TEMP "espressif"
+
+          if (Test-Path -LiteralPath $IdfPath) {
+              Remove-Item -LiteralPath $IdfPath -Recurse -Force
+          }
+
+          git clone `
+              --branch $env:IDF_VERSION `
+              --depth 1 `
+              --recurse-submodules `
+              --shallow-submodules `
+              https://github.com/espressif/esp-idf.git `
+              $IdfPath
+
+          if ($LASTEXITCODE -ne 0) {
+              throw "Unable to clone ESP-IDF $env:IDF_VERSION."
+          }
+
+          $DetectedTag = (
+              git -C $IdfPath describe --tags --exact-match
+          ).Trim()
+
+          if ($LASTEXITCODE -ne 0) {
+              throw "Unable to verify the ESP-IDF release tag."
+          }
+
+          if ($DetectedTag -ne $env:IDF_VERSION) {
+              throw "ESP-IDF tag mismatch: '$DetectedTag'."
+          }
+
+          $DetectedCommit = (
+              git -C $IdfPath rev-parse --short=7 HEAD
+          ).Trim()
+
+          if ($LASTEXITCODE -ne 0) {
+              throw "Unable to verify the ESP-IDF release commit."
+          }
+
+          if (-not $DetectedCommit.StartsWith($env:IDF_COMMIT_PREFIX)) {
+              throw "Unexpected ESP-IDF commit: '$DetectedCommit'."
+          }
+
+          "IDF_PATH=$IdfPath" |
+              Out-File `
+                  -FilePath $env:GITHUB_ENV `
+                  -Encoding utf8 `
+                  -Append
+
+          "IDF_TOOLS_PATH=$IdfToolsPath" |
+              Out-File `
+                  -FilePath $env:GITHUB_ENV `
+                  -Encoding utf8 `
+                  -Append
+
+          Write-Host "ESP-IDF tag:    $DetectedTag"
+          Write-Host "ESP-IDF commit: $DetectedCommit"
+          Write-Host "ESP-IDF path:   $IdfPath"
+
+      - name: Install controlled ESP-IDF tools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $InstallScript = Join-Path $env:IDF_PATH "install.ps1"
+
+          if (
+              -not (
+                  Test-Path `
+                      -LiteralPath $InstallScript `
+                      -PathType Leaf
+              )
+          ) {
+              throw "ESP-IDF install script is missing: $InstallScript"
+          }
+
+          & $InstallScript esp32s3
+
+          if ($LASTEXITCODE -ne 0) {
+              throw "ESP-IDF tool installation failed."
+          }
+
+      - name: Build controlled profile
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          & .\tools\ci\run_profile_build.ps1 `
+              -Profile "${{ matrix.profile }}" `
+              -RepoRoot $env:GITHUB_WORKSPACE `
+              -IdfPath $env:IDF_PATH `
+              -HardwareCompatibility "heltec-wifi-lora-32-v3"
+
+          if ($LASTEXITCODE -ne 0) {
+              throw "Controlled profile build failed."
+          }
+
+      - name: Upload profile artifacts and evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: b4-1-${{ matrix.profile }}-${{ github.sha }}
+          path: artifacts/b4.1/profile-build/${{ matrix.profile }}
+          if-no-files-found: warn
+          retention-days: 14
+          compression-level: 6
