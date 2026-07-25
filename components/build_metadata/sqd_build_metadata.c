@@ -8,21 +8,14 @@
 
 static const char *TAG = "sqd_metadata";
 
-__attribute__((used, section(".rodata_custom_desc")))
-const char sqd_build_metadata_blob[] =
+__attribute__((used, section(".rodata_custom_desc"))) const char sqd_build_metadata_blob[] =
     "SQD_META_V1"
-    "|version=" SQD_META_PRODUCT_VERSION
-    "|git=" SQD_META_GIT_COMMIT
-    "|dirty=" SQD_META_GIT_DIRTY_STRING
-    "|source_time=" SQD_META_SOURCE_TIMESTAMP_UTC
-    "|build_time=" SQD_META_BUILD_TIMESTAMP_UTC
-    "|profile=" SQD_META_BUILD_PROFILE
-    "|target=" SQD_META_TARGET
-    "|hardware=" SQD_META_HARDWARE_COMPATIBILITY
+    "|version=" SQD_META_PRODUCT_VERSION "|git=" SQD_META_GIT_COMMIT "|dirty=" SQD_META_GIT_DIRTY_STRING
+    "|source_time=" SQD_META_SOURCE_TIMESTAMP_UTC "|build_time=" SQD_META_BUILD_TIMESTAMP_UTC
+    "|profile=" SQD_META_BUILD_PROFILE "|target=" SQD_META_TARGET "|hardware=" SQD_META_HARDWARE_COMPATIBILITY
     "|compiler=" __VERSION__;
 
-const sqd_build_metadata_t *sqd_build_metadata_get(void)
-{
+const sqd_build_metadata_t *sqd_build_metadata_get(void) {
     static sqd_build_metadata_t metadata;
     static char elf_sha256[65];
     const esp_app_desc_t *app = esp_app_get_description();
@@ -47,8 +40,7 @@ const sqd_build_metadata_t *sqd_build_metadata_get(void)
     return &metadata;
 }
 
-void sqd_build_metadata_log(void)
-{
+void sqd_build_metadata_log(void) {
     const sqd_build_metadata_t *m = sqd_build_metadata_get();
     ESP_LOGI(TAG, "SQD_META schema=1");
     ESP_LOGI(TAG, "SQD_META product_version=%s", m->product_version);

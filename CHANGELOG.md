@@ -9,6 +9,8 @@ The project follows Semantic Versioning.
 ### Added
 
 - Production repository and engineering-governance baseline.
+- B4.1 continuous-integration workflow for formatting, host tests and controlled ESP-IDF profile builds.
+- Pinned CI tooling and validators for workflow, formatting, Clang-Tidy configuration and profile-build integration.
 
 ### Changed
 

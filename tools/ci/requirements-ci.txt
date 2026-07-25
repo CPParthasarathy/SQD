@@ -1,0 +1,5 @@
+# B4.1 continuous-integration toolchain.
+# Keep CI-only packages separate from the B3.3 ESP-IDF Python environment.
+clang-format==22.1.8
+clang-tidy==22.1.8
+PyYAML==6.0.3
