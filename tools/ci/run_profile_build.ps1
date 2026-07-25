@@ -1135,6 +1135,14 @@ catch {
     throw
 }
 finally {
+    # Windows cannot remove a worktree while this PowerShell
+    # process is located inside that worktree. Return to the
+    # original repository before invoking git worktree remove.
+    if ((Get-Location).Path -ne $ResolvedRepoRoot) {
+        Set-Location -LiteralPath $ResolvedRepoRoot
+    }
+
+
     Write-Host ""
     Write-Host "=== Remove isolated compatibility worktree ==="
 

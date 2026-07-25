@@ -93,6 +93,73 @@ class B42TextFileTests(unittest.TestCase):
 
 
 
+
+class B42WorktreeCleanupTests(unittest.TestCase):
+    def test_profile_wrapper_returns_to_repository_before_cleanup(
+        self,
+    ) -> None:
+        from pathlib import Path
+
+        wrapper_path = (
+            Path(__file__).resolve().parents[1]
+            / "run_profile_build.ps1"
+        )
+
+        wrapper_text = wrapper_path.read_text(
+            encoding="utf-8"
+        )
+
+        cleanup_marker = (
+            'Write-Host '
+            '"=== Remove isolated compatibility worktree ==="'
+        )
+
+        cleanup_index = wrapper_text.index(
+            cleanup_marker
+        )
+
+        finally_index = wrapper_text.rfind(
+            "finally {",
+            0,
+            cleanup_index,
+        )
+
+        self.assertGreaterEqual(
+            finally_index,
+            0,
+        )
+
+        location_statement = (
+            "Set-Location -LiteralPath $ResolvedRepoRoot"
+        )
+
+        location_index = wrapper_text.find(
+            location_statement,
+            finally_index,
+            cleanup_index,
+        )
+
+        self.assertGreaterEqual(
+            location_index,
+            0,
+        )
+
+        remove_index = wrapper_text.find(
+            '"worktree"',
+            cleanup_index,
+        )
+
+        self.assertGreaterEqual(
+            remove_index,
+            0,
+        )
+
+        self.assertLess(
+            location_index,
+            remove_index,
+        )
+
+
 class B42VerificationTests(unittest.TestCase):
     """Verify positive and negative archive-matrix behavior."""
 
