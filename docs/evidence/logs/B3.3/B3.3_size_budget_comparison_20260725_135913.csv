@@ -1,0 +1,7 @@
+﻿"Check","Actual","Limit","Unit","Pass"
+"production-profile","production","production","profile","True"
+"single-app-partition-scheme","True","True","boolean","True"
+"application-binary-budget","124480","163840","bytes-max","True"
+"linked-image-total-budget","124363","163840","bytes-max","True"
+"application-partition-capacity","124480","1048576","bytes-max","True"
+"minimum-partition-headroom","924096","884736","bytes-min","True"

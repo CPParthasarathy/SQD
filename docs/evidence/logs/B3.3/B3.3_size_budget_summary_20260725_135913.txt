@@ -1,0 +1,24 @@
+============================================================
+B3.3 FIRMWARE IMAGE-SIZE BUDGET
+============================================================
+Status:                       PASS
+Timestamp:                    2026-07-25T14:01:04.1010210+02:00
+Branch:                       fix/b3.3-clang-format-baseline
+Commit:                       4602dc32e84c6b10bd5e85d1d7fbbbc780755f9f
+Profile:                      production
+Project:                      sqd_firmware
+Application binary bytes:     124480
+Application binary budget:    163840
+Linked image total bytes:     124363
+Linked image budget:          163840
+Application partition bytes:  1048576
+Partition headroom bytes:     924096
+Minimum required headroom:    884736
+Partition usage percent:      11.87
+Checks:                       6
+Failures:                     0
+Comparison CSV:               D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_comparison_20260725_135913.csv
+Size report:                  D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_measurement_20260725_135913.json
+Result JSON:                  D:\OneDrive\SQD\docs\evidence\logs\B3.3\B3.3_size_budget_result_20260725_135913.json
+
+B3.3 FIRMWARE IMAGE-SIZE BUDGET PASS
