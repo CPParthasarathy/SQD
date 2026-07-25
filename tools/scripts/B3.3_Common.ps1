@@ -17,7 +17,15 @@ $script:B33_DefaultIdfPath = "D:\esp\v6.0.2\esp-idf"
 $script:B33_RequiredIdfVersionPattern = '^ESP-IDF v6\.0\.2(?:\b|$)'
 $script:B33_RequiredPythonVersion = "Python 3.11.15"
 $script:B33_RequiredPythonEnvPath = "C:\Users\parth\.espressif\python_env\idf6.0_py3.11_env"
-$script:B33_ExpectedBranch = "feat/b3.3-reproducible-build-controls"
+$script:B33_DefaultExpectedBranch = "feat/b3.3-reproducible-build-controls"
+$script:B33_ExpectedBranch = if (
+    [string]::IsNullOrWhiteSpace($env:SQD_B33_EXPECTED_BRANCH)
+) {
+    $script:B33_DefaultExpectedBranch
+}
+else {
+    $env:SQD_B33_EXPECTED_BRANCH.Trim()
+}
 $script:B33_Target = "esp32s3"
 $script:B33_HardwareCompatibility = "heltec-wifi-lora-32-v3"
 

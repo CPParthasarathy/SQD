@@ -1,0 +1,31 @@
+{
+    "work_package":  "B3.3",
+    "operation":  "configuration-drift",
+    "status":  "PASS",
+    "timestamp_local":  "2026-07-25T13:59:00.6889748+02:00",
+    "repository":  {
+                       "root":  "D:\\OneDrive\\SQD",
+                       "branch":  "fix/b3.3-clang-format-baseline",
+                       "commit":  "4602dc32e84c6b10bd5e85d1d7fbbbc780755f9f",
+                       "commit_short":  "4602dc32e84c"
+                   },
+    "baseline":  {
+                     "path":  "D:\\OneDrive\\SQD\\tools\\config\\B3.3_configuration_baseline.json",
+                     "schema_version":  1,
+                     "controlled_file_count":  4,
+                     "profile_count":  3
+                 },
+    "toolchain":  {
+                      "idf_path":  "D:\\esp\\v6.0.2\\esp-idf",
+                      "idf_version":  "ESP-IDF v6.0.2",
+                      "python":  "C:\\Users\\parth\\.espressif\\python_env\\idf6.0_py3.11_env\\Scripts\\python.exe",
+                      "target":  "esp32s3",
+                      "source_date_epoch":  1784979923
+                  },
+    "verification":  {
+                         "check_count":  22,
+                         "pass_count":  22,
+                         "fail_count":  0,
+                         "comparison_csv":  "D:\\OneDrive\\SQD\\docs\\evidence\\logs\\B3.3\\B3.3_configuration_drift_comparison_20260725_135650.csv"
+                     }
+}
