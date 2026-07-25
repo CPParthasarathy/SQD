@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import ModuleType
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ARCHIVE_PATH = REPO_ROOT / "tools" / "ci" / "artifact_archive.py"
@@ -42,6 +43,32 @@ def load_module(module_name: str, module_path: Path) -> ModuleType:
 
 ARCHIVE = load_module("sqd_b42_archive_tests", ARCHIVE_PATH)
 VERIFY = load_module("sqd_b42_verify_tests", VERIFY_PATH)
+
+GITHUB_ENVIRONMENT_VARIABLES = (
+    "GITHUB_ACTIONS",
+    "GITHUB_WORKFLOW",
+    "GITHUB_JOB",
+    "GITHUB_RUN_ID",
+    "GITHUB_RUN_NUMBER",
+    "GITHUB_RUN_ATTEMPT",
+    "GITHUB_EVENT_NAME",
+    "GITHUB_REF",
+    "GITHUB_HEAD_REF",
+    "GITHUB_BASE_REF",
+    "GITHUB_SHA",
+    "GITHUB_REPOSITORY",
+)
+
+
+def github_environment(**overrides: str):
+    """Provide deterministic GitHub metadata for an archive fixture."""
+
+    values = {
+        name: ""
+        for name in GITHUB_ENVIRONMENT_VARIABLES
+    }
+    values.update(overrides)
+    return mock.patch.dict(os.environ, values)
 
 
 class B42TextFileTests(unittest.TestCase):
@@ -199,20 +226,24 @@ class B42VerificationTests(unittest.TestCase):
 
     def test_complete_profile_matrix_passes(self) -> None:
         source_commit = "1" * 40
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            archive_root = Path(temporary_directory)
-            for profile in VERIFY.PROFILES:
-                self.create_profile_archive(
+
+        # This fixture represents a local archive. It must not inherit
+        # GitHub Actions metadata from the process running the test.
+        with github_environment():
+            with tempfile.TemporaryDirectory() as temporary_directory:
+                archive_root = Path(temporary_directory)
+                for profile in VERIFY.PROFILES:
+                    self.create_profile_archive(
+                        archive_root,
+                        profile,
+                        source_commit,
+                    )
+                VERIFY.verify_archive_matrix(
+                    REPO_ROOT,
                     archive_root,
-                    profile,
+                    VERIFY.PROFILES,
                     source_commit,
                 )
-            VERIFY.verify_archive_matrix(
-                REPO_ROOT,
-                archive_root,
-                VERIFY.PROFILES,
-                source_commit,
-            )
 
     def test_missing_profile_archive_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -228,19 +259,16 @@ class B42VerificationTests(unittest.TestCase):
         source_commit = "1" * 40
         with tempfile.TemporaryDirectory() as temporary_directory:
             archive_root = Path(temporary_directory)
-            old_actions = os.environ.get("GITHUB_ACTIONS")
-            os.environ["GITHUB_ACTIONS"] = "true"
-            try:
+
+            # Set only the Actions marker. All other GitHub fields stay
+            # empty so the fixture is deterministically incomplete.
+            with github_environment(GITHUB_ACTIONS="true"):
                 self.create_profile_archive(
                     archive_root,
                     "debug",
                     source_commit,
                 )
-            finally:
-                if old_actions is None:
-                    os.environ.pop("GITHUB_ACTIONS", None)
-                else:
-                    os.environ["GITHUB_ACTIONS"] = old_actions
+
             with self.assertRaises(VERIFY.VerificationError):
                 VERIFY.verify_archive_matrix(
                     REPO_ROOT,
