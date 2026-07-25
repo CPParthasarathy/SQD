@@ -156,6 +156,16 @@ function Assert-B33ToolchainSnapshot {
     }
 
     Assert-B33ExactPath `
+        -Name "clang-format" `
+        -Actual ([string]$Snapshot.clang_format.path) `
+        -Expected ([string]$Baseline.clang_format.path)
+
+    Assert-B33ExactText `
+        -Name "clang-format version" `
+        -Actual ([string]$Snapshot.clang_format.version) `
+        -Expected ([string]$Baseline.clang_format.version)
+
+    Assert-B33ExactPath `
         -Name "Git" `
         -Actual ([string]$Snapshot.git.path) `
         -Expected ([string]$Baseline.git.path)
@@ -259,6 +269,7 @@ try {
     $CompilerCommand = Get-Command `
         ([string]$Baseline.compiler.command) `
         -ErrorAction Stop
+    $ClangFormatCommand = Get-Command clang-format.exe -ErrorAction Stop
     $GitCommand = Get-Command git.exe -ErrorAction Stop
 
     $Snapshot = [ordered]@{
@@ -289,6 +300,12 @@ try {
             path = $CompilerCommand.Source
             version = Get-B33FirstOutputLine `
                 -FilePath $CompilerCommand.Source `
+                -Arguments @("--version")
+        }
+        clang_format = [ordered]@{
+            path = $ClangFormatCommand.Source
+            version = Get-B33FirstOutputLine `
+                -FilePath $ClangFormatCommand.Source `
                 -Arguments @("--version")
         }
         git = [ordered]@{
@@ -377,6 +394,26 @@ try {
         }
 
     $Mutation = Copy-B33Object -InputObject $Snapshot
+    $Mutation.clang_format.version = "clang-format version 0.0.0"
+    $RejectionTests += Test-B33ExpectedRejection `
+        -Name "reject-wrong-clang-format-version" `
+        -Action {
+            Assert-B33ToolchainSnapshot `
+                -Snapshot $Mutation `
+                -Baseline $Baseline
+        }
+
+    $Mutation = Copy-B33Object -InputObject $Snapshot
+    $Mutation.clang_format.path = "C:\unapproved\clang-format.exe"
+    $RejectionTests += Test-B33ExpectedRejection `
+        -Name "reject-wrong-clang-format-path" `
+        -Action {
+            Assert-B33ToolchainSnapshot `
+                -Snapshot $Mutation `
+                -Baseline $Baseline
+        }
+
+    $Mutation = Copy-B33Object -InputObject $Snapshot
     $Mutation.git.version = "git version 0.0.0"
     $RejectionTests += Test-B33ExpectedRejection `
         -Name "reject-wrong-git-version" `
@@ -455,6 +492,8 @@ try {
         "CMake:                     $($Snapshot.cmake.version)"
         "Ninja:                     $($Snapshot.ninja.version)"
         "Compiler:                  $($Snapshot.compiler.version)"
+        "clang-format:              $($Snapshot.clang_format.version)"
+        "clang-format path:         $($Snapshot.clang_format.path)"
         "Git:                       $($Snapshot.git.version)"
         "Rejection tests:           $($RejectionTests.Count)"
         "Rejected correctly:        $(@($RejectionTests | Where-Object Pass).Count)"
