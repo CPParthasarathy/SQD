@@ -1,4 +1,4 @@
-name: B4.1 Continuous Integration
+name: B4.2 Artifact Archive and Traceability
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: b4-1-ci-${{ github.workflow }}-${{ github.ref }}
+  group: b4-2-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -45,6 +45,14 @@ jobs:
 
       - name: Validate workflow contract
         run: python tools/ci/check_workflow.py
+
+      - name: Validate artifact archive contract
+        run: |
+          python tools/ci/artifact_archive.py contract
+          python tools/ci/artifact_archive.py self-test
+
+      - name: Validate B4.2 repository contract
+        run: python tools/ci/verify_b4_2.py --contract-only
 
       - name: Verify C and C++ formatting
         run: python tools/ci/check_format.py
@@ -188,12 +196,25 @@ jobs:
               throw "Controlled profile build failed."
           }
 
+      - name: Verify finalized profile archive
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          python -B .\tools\ci\artifact_archive.py verify `
+              --archive-root "artifacts/b4.2/profile-build/${{ matrix.profile }}" `
+              --profile "${{ matrix.profile }}" `
+              --source-commit "${{ github.sha }}"
+          if ($LASTEXITCODE -ne 0) {
+              throw "Finalized B4.2 profile archive verification failed."
+          }
+
       - name: Upload profile artifacts and evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: b4-1-${{ matrix.profile }}-${{ github.sha }}
-          path: artifacts/b4.1/profile-build/${{ matrix.profile }}
-          if-no-files-found: warn
-          retention-days: 14
+          name: b4-2-${{ matrix.profile }}-${{ github.sha }}-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: artifacts/b4.2/profile-build/${{ matrix.profile }}
+          if-no-files-found: error
+          retention-days: 30
           compression-level: 6

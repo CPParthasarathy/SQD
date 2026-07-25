@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the controlled B4.1 GitHub Actions workflow."""
+"""Validate the controlled B4.2 GitHub Actions workflow."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from typing import Any, Iterable, Mapping, Sequence
 import yaml
 
 
-EXPECTED_WORKFLOW_NAME = "B4.1 Continuous Integration"
+EXPECTED_WORKFLOW_NAME = "B4.2 Artifact Archive and Traceability"
 EXPECTED_PROFILES = (
     "debug",
     "validation",
@@ -37,7 +37,7 @@ REQUIRED_ACTIONS = frozenset(
 
 
 class WorkflowContractError(RuntimeError):
-    """Raised when the workflow does not meet the B4.1 contract."""
+    """Raised when the workflow does not meet the B4.2 contract."""
 
 
 def require_mapping(
@@ -200,7 +200,7 @@ def walk_values(value: Any) -> Iterable[Any]:
 
 
 def validate_workflow(path: Path) -> Mapping[str, Any]:
-    """Validate the full B4.1 workflow contract."""
+    """Validate the full B4.2 workflow contract."""
 
     workflow = load_workflow(path)
 
@@ -273,6 +273,14 @@ def validate_workflow(path: Path) -> Mapping[str, Any]:
             "Workflow must cancel superseded executions."
         )
 
+    if (
+        concurrency.get("group")
+        != "b4-2-ci-${{ github.workflow }}-${{ github.ref }}"
+    ):
+        raise WorkflowContractError(
+            "Workflow concurrency group is incorrect."
+        )
+
     environment = require_mapping(
         workflow.get("env"),
         "Workflow environment",
@@ -327,6 +335,9 @@ def validate_workflow(path: Path) -> Mapping[str, Any]:
 
     required_quality_commands = (
         "tools/ci/check_workflow.py",
+        "tools/ci/artifact_archive.py contract",
+        "tools/ci/artifact_archive.py self-test",
+        "tools/ci/verify_b4_2.py --contract-only",
         "tools/ci/check_format.py",
         "tools/ci/check_clang_tidy.py --config-only",
         "tools/ci/run_host_tests.py",
@@ -401,6 +412,7 @@ def validate_workflow(path: Path) -> Mapping[str, Any]:
         "install.ps1",
         "tools\\ci\\run_profile_build.ps1",
         '-Profile "${{ matrix.profile }}"',
+        "artifact_archive.py verify",
     )
 
     for required_command in required_profile_commands:
@@ -450,11 +462,15 @@ def validate_workflow(path: Path) -> Mapping[str, Any]:
         for step in profile_steps
         if step.get("uses") == "actions/upload-artifact@v4"
     ]
-
     if len(upload_steps) != 1:
         raise WorkflowContractError(
             "Profile-build job must contain exactly one artifact "
             "upload step."
+        )
+
+    if upload_steps[0].get("if") != "${{ always() }}":
+        raise WorkflowContractError(
+            "Artifact upload must execute with always()."
         )
 
     upload_contract = require_mapping(
@@ -462,17 +478,36 @@ def validate_workflow(path: Path) -> Mapping[str, Any]:
         "Artifact upload contract",
     )
 
+    expected_artifact_name = (
+        "b4-2-${{ matrix.profile }}-${{ github.sha }}-"
+        "run-${{ github.run_id }}-attempt-${{ github.run_attempt }}"
+    )
+    if upload_contract.get("name") != expected_artifact_name:
+        raise WorkflowContractError(
+            "Artifact upload name is incorrect."
+        )
+
     if (
         upload_contract.get("path")
-        != "artifacts/b4.1/profile-build/${{ matrix.profile }}"
+        != "artifacts/b4.2/profile-build/${{ matrix.profile }}"
     ):
         raise WorkflowContractError(
             "Artifact upload path is incorrect."
         )
 
-    if upload_contract.get("retention-days") != "14":
+    if upload_contract.get("if-no-files-found") != "error":
         raise WorkflowContractError(
-            "Artifact retention must be 14 days."
+            "Missing profile archives must fail the upload step."
+        )
+
+    if upload_contract.get("retention-days") != "30":
+        raise WorkflowContractError(
+            "Artifact retention must be 30 days."
+        )
+
+    if upload_contract.get("compression-level") != "6":
+        raise WorkflowContractError(
+            "Artifact compression level must be 6."
         )
 
     return workflow
@@ -485,7 +520,7 @@ def parse_arguments() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser(
         description=(
-            "Validate the controlled B4.1 GitHub Actions workflow."
+            "Validate the controlled B4.2 GitHub Actions workflow."
         )
     )
 
@@ -525,7 +560,7 @@ def main() -> int:
     try:
         validate_workflow(workflow_path)
 
-        print("B4.1 workflow contract")
+        print("B4.2 workflow contract")
         print(f"Repository: {repo_root}")
         print(f"Workflow:   {workflow_path}")
         print("YAML parsing: PASS")
@@ -535,7 +570,7 @@ def main() -> int:
         print("Profile matrix: PASS")
         print("Artifact contract: PASS")
         print("")
-        print("PASS: B4.1 GitHub Actions workflow validated.")
+        print("PASS: B4.2 GitHub Actions workflow validated.")
 
         return 0
 

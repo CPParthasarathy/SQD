@@ -49,14 +49,28 @@ function Invoke-B41Git {
             -ErrorAction Stop
     }
 
-    $Output = @(
-        & $GitCommand.Source `
-            -C $WorkingDirectory `
-            @Arguments `
-            2>&1
-    )
+    $PreviousErrorActionPreference = $ErrorActionPreference
 
-    $ExitCode = $LASTEXITCODE
+    try {
+        # Windows PowerShell 5.1 represents native stderr as an error
+        # record. Git writes successful progress messages such as
+        # "Preparing worktree" to stderr, so temporarily prevent those
+        # records from terminating the wrapper. The native exit code remains
+        # the authoritative success criterion below.
+        $ErrorActionPreference = "Continue"
+
+        $Output = @(
+            & $GitCommand.Source `
+                -C $WorkingDirectory `
+                @Arguments `
+                2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $PreviousErrorActionPreference
+    }
     $Text = ($Output -join [Environment]::NewLine).Trim()
 
     if (
@@ -81,6 +95,86 @@ $Text
         ExitCode = $ExitCode
         Text = $Text
         Lines = @($Output)
+    }
+}
+
+function Invoke-B42ArchiveTool {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$RepositoryRoot,
+
+        [Parameter(Mandatory)]
+        [string[]]$Arguments
+    )
+
+    $PythonCommand = Get-Command `
+        python.exe `
+        -ErrorAction SilentlyContinue
+    if ($null -eq $PythonCommand) {
+        $PythonCommand = Get-Command `
+            python `
+            -ErrorAction Stop
+    }
+
+    $ArchiveToolPath = Join-Path `
+        $RepositoryRoot `
+        "tools\ci\artifact_archive.py"
+
+    $ArchiveContractPath = Join-Path `
+        $RepositoryRoot `
+        "tools\ci\artifact_archive_contract.json"
+
+    foreach ($RequiredFile in @(
+        $ArchiveToolPath
+        $ArchiveContractPath
+    )) {
+        if (
+            -not (
+                Test-Path `
+                    -LiteralPath $RequiredFile `
+                    -PathType Leaf
+            )
+        ) {
+            throw "Required B4.2 archive file is missing: $RequiredFile"
+        }
+    }
+
+    $PreviousErrorActionPreference = $ErrorActionPreference
+
+    try {
+        # Preserve stderr as captured diagnostic output. Under Windows
+        # PowerShell 5.1, native stderr otherwise becomes a terminating error
+        # when the repository-wide preference is Stop.
+        $ErrorActionPreference = "Continue"
+
+        $Output = @(
+            & $PythonCommand.Source `
+                -B `
+                $ArchiveToolPath `
+                --contract `
+                $ArchiveContractPath `
+                @Arguments `
+                2>&1
+        )
+
+        $ExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $PreviousErrorActionPreference
+    }
+
+    if ($Output.Count -gt 0) {
+        Write-Host (
+            $Output -join [Environment]::NewLine
+        )
+    }
+
+    if ($ExitCode -ne 0) {
+        throw (
+            "B4.2 artifact archive command failed with exit code " +
+            "${ExitCode}: $($Arguments -join ' ')"
+        )
     }
 }
 
@@ -424,7 +518,7 @@ function Copy-B41BuildEvidence {
 
     $ArtifactRoot = Join-Path `
         $OriginalRepositoryRoot `
-        "artifacts\b4.1\profile-build\$ProfileName"
+        "artifacts\b4.2\profile-build\$ProfileName"
 
     New-Item `
         -ItemType Directory `
@@ -546,7 +640,7 @@ $ResolvedRepoRoot = Assert-B41Repository `
 $Contract = Assert-B41B32Contract `
     -RepositoryRoot $ResolvedRepoRoot
 
-Write-Host "B4.1 profile-build wrapper"
+Write-Host "B4.2 profile-build archive wrapper"
 Write-Host "Repository:           $ResolvedRepoRoot"
 Write-Host "Profile:              $Profile"
 Write-Host "B3.2 build entry:     $($Contract.BuildScript)"
@@ -557,14 +651,21 @@ Write-Host (
 )
 
 if ($ContractOnly) {
+    Invoke-B42ArchiveTool `
+        -RepositoryRoot $ResolvedRepoRoot `
+        -Arguments @(
+            "contract"
+        )
+
     Write-Host ""
     Write-Host "PowerShell parsing: PASS"
     Write-Host "B3.2 required functions: PASS"
     Write-Host "B3.2 profile contract: PASS"
     Write-Host "B3.2 build-stage calls: PASS"
+    Write-Host "B4.2 archive contract: PASS"
     Write-Host ""
     Write-Host (
-        "PASS: B4.1 profile-build wrapper contract validated."
+        "PASS: B4.2 profile-build archive contract validated."
     )
 
     return
@@ -613,6 +714,56 @@ if ($Commit -notmatch '^[0-9a-fA-F]{40}$') {
     throw "Unable to resolve a full source commit: '$Commit'"
 }
 
+$SourceRepository = if (
+    -not [string]::IsNullOrWhiteSpace(
+        $env:GITHUB_REPOSITORY
+    )
+) {
+    $env:GITHUB_REPOSITORY
+}
+else {
+    (
+        Invoke-B41Git `
+            -WorkingDirectory $ResolvedRepoRoot `
+            -Arguments @(
+                "remote"
+                "get-url"
+                "origin"
+            )
+    ).Text
+}
+
+if ([string]::IsNullOrWhiteSpace($SourceRepository)) {
+    throw "Unable to resolve the source repository identity."
+}
+
+$IdfVersion = (
+    Invoke-B41Git `
+        -WorkingDirectory $ResolvedIdfPath `
+        -Arguments @(
+            "describe"
+            "--tags"
+            "--exact-match"
+        )
+).Text
+
+if ([string]::IsNullOrWhiteSpace($IdfVersion)) {
+    throw "Unable to resolve the ESP-IDF version tag."
+}
+
+$IdfCommit = (
+    Invoke-B41Git `
+        -WorkingDirectory $ResolvedIdfPath `
+        -Arguments @(
+            "rev-parse"
+            "HEAD"
+        )
+).Text
+
+if ($IdfCommit -notmatch '^[0-9a-fA-F]{40}$') {
+    throw "Unable to resolve the full ESP-IDF commit: '$IdfCommit'"
+}
+
 $ExistingCompatibilityBranch = Invoke-B41Git `
     -WorkingDirectory $ResolvedRepoRoot `
     -Arguments @(
@@ -644,7 +795,7 @@ else {
 $WorktreeRoot = Join-Path `
     $TemporaryBase `
     (
-        "sqd-b4.1-" +
+        "sqd-b4.2-" +
         $Profile +
         "-" +
         [System.Guid]::NewGuid().ToString("N")
@@ -652,7 +803,7 @@ $WorktreeRoot = Join-Path `
 
 $ArtifactRoot = Join-Path `
     $ResolvedRepoRoot `
-    "artifacts\b4.1\profile-build\$Profile"
+    "artifacts\b4.2\profile-build\$Profile"
 
 $WorktreeCreated = $false
 $CompatibilityBranchCreated = $false
@@ -812,8 +963,6 @@ try {
         )
     }
 
-    $BuildPassed = $true
-
     Write-Host ""
     Write-Host "=== Copy profile artifacts and evidence ==="
 
@@ -824,20 +973,29 @@ try {
 
     $Provenance = [ordered]@{
         schema_version = 1
-        work_package = "B4.1"
-        operation = "profile-build-wrapper"
+        work_package = "B4.2"
+        operation = "profile-build-archive-wrapper"
         status = "PASS"
         timestamp_utc = [DateTime]::UtcNow.ToString("o")
         profile = $Profile
         source = [ordered]@{
-            repository = $ResolvedRepoRoot
+            repository = $SourceRepository
+            local_repository = $ResolvedRepoRoot
             commit = $Commit
-            github_actions = $env:GITHUB_ACTIONS
-            github_event_name = $env:GITHUB_EVENT_NAME
-            github_ref = $env:GITHUB_REF
-            github_head_ref = $env:GITHUB_HEAD_REF
-            github_base_ref = $env:GITHUB_BASE_REF
-            github_sha = $env:GITHUB_SHA
+            github = [ordered]@{
+                actions = $env:GITHUB_ACTIONS
+                workflow = $env:GITHUB_WORKFLOW
+                job = $env:GITHUB_JOB
+                run_id = $env:GITHUB_RUN_ID
+                run_number = $env:GITHUB_RUN_NUMBER
+                run_attempt = $env:GITHUB_RUN_ATTEMPT
+                event_name = $env:GITHUB_EVENT_NAME
+                ref = $env:GITHUB_REF
+                head_ref = $env:GITHUB_HEAD_REF
+                base_ref = $env:GITHUB_BASE_REF
+                sha = $env:GITHUB_SHA
+                repository = $env:GITHUB_REPOSITORY
+            }
         }
         compatibility = [ordered]@{
             branch = $B32CompatibilityBranch
@@ -846,6 +1004,8 @@ try {
         }
         toolchain = [ordered]@{
             idf_path = $ResolvedIdfPath
+            esp_idf_version = $IdfVersion
+            esp_idf_commit = $IdfCommit
             hardware_compatibility = $HardwareCompatibility
         }
         artifact_root = $ArtifactRoot
@@ -853,7 +1013,7 @@ try {
 
     $ProvenancePath = Join-Path `
         $ArtifactRoot `
-        "B4.1_profile_build_provenance.json"
+        "B4.2_profile_build_provenance.json"
 
     $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
@@ -876,6 +1036,66 @@ try {
         throw "Profile-build provenance was not created."
     }
 
+    Write-Host ""
+    Write-Host "=== Finalize and verify B4.2 artifact archive ==="
+
+    Invoke-B42ArchiveTool `
+        -RepositoryRoot $ResolvedRepoRoot `
+        -Arguments @(
+            "finalize"
+            "--archive-root"
+            $ArtifactRoot
+            "--profile"
+            $Profile
+            "--source-repository"
+            $SourceRepository
+            "--source-commit"
+            $Commit
+            "--hardware-compatibility"
+            $HardwareCompatibility
+            "--idf-version"
+            $IdfVersion
+            "--idf-commit"
+            $IdfCommit
+        )
+
+    Invoke-B42ArchiveTool `
+        -RepositoryRoot $ResolvedRepoRoot `
+        -Arguments @(
+            "verify"
+            "--archive-root"
+            $ArtifactRoot
+            "--profile"
+            $Profile
+            "--source-commit"
+            $Commit
+        )
+
+    $ManifestPath = Join-Path `
+        $ArtifactRoot `
+        "B4.2_artifact_manifest.json"
+
+    $ChecksumPath = Join-Path `
+        $ArtifactRoot `
+        "SHA256SUMS.txt"
+
+    foreach ($RequiredArchiveFile in @(
+        $ManifestPath
+        $ChecksumPath
+    )) {
+        if (
+            -not (
+                Test-Path `
+                    -LiteralPath $RequiredArchiveFile `
+                    -PathType Leaf
+            )
+        ) {
+            throw "Finalized archive file is missing: $RequiredArchiveFile"
+        }
+    }
+
+    $BuildPassed = $true
+
     if (
         -not [string]::IsNullOrWhiteSpace(
             $env:GITHUB_OUTPUT
@@ -890,6 +1110,8 @@ try {
 
     Write-Host "Artifact root: $ArtifactRoot"
     Write-Host "Provenance:    $ProvenancePath"
+    Write-Host "Manifest:      $ManifestPath"
+    Write-Host "Checksums:     $ChecksumPath"
 }
 catch {
     Write-Host ""
@@ -913,6 +1135,14 @@ catch {
     throw
 }
 finally {
+    # Windows cannot remove a worktree while this PowerShell
+    # process is located inside that worktree. Return to the
+    # original repository before invoking git worktree remove.
+    if ((Get-Location).Path -ne $ResolvedRepoRoot) {
+        Set-Location -LiteralPath $ResolvedRepoRoot
+    }
+
+
     Write-Host ""
     Write-Host "=== Remove isolated compatibility worktree ==="
 
@@ -965,11 +1195,11 @@ finally {
 }
 
 if (-not $BuildPassed) {
-    throw "B4.1 profile build did not reach PASS."
+    throw "B4.2 profile build archive did not reach PASS."
 }
 
 Write-Host ""
 Write-Host (
-    "PASS: B4.1 $Profile profile build completed " +
-    "through the unchanged B3.2 contract."
+    "PASS: B4.2 $Profile profile archive completed " +
+    "through the unchanged B3.2 build contract."
 )

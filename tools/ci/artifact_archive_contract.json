@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "work_package": "B4.2",
+  "archive_root": "artifacts/b4.2/profile-build",
+  "profiles": [
+    "debug",
+    "validation",
+    "production"
+  ],
+  "retention_days": 30,
+  "required_static_paths": [
+    "build/sdkconfig",
+    "build/project_description.json",
+    "build/flasher_args.json",
+    "build/bootloader/bootloader.bin",
+    "build/partition_table/partition-table.bin",
+    "B4.2_profile_build_provenance.json"
+  ],
+  "required_project_suffixes": [
+    ".bin",
+    ".elf",
+    ".map"
+  ],
+  "required_evidence_globs": [
+    "evidence/B3.2_${profile}_build_result_*.json"
+  ],
+  "manifest_path": "B4.2_artifact_manifest.json",
+  "checksum_path": "SHA256SUMS.txt"
+}
