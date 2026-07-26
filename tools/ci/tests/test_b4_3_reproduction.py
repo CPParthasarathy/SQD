@@ -141,6 +141,27 @@ class B43RepositoryContractTests(unittest.TestCase):
             ):
                 VERIFY.validate_contract(path)
 
+    def test_rejects_incomplete_local_verification_record(
+        self,
+    ) -> None:
+        record = RECORD_PATH.read_text(encoding="utf-8")
+        record = record.replace(
+            VERIFY.LOCAL_VERIFICATION_TERMS[-1],
+            "0" * 64,
+            1,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "record.md"
+            path.write_text(
+                record,
+                encoding="utf-8",
+                newline="\n",
+            )
+            with self.assertRaises(
+                VERIFY.VerificationError
+            ):
+                VERIFY.validate_lifecycle_record(path)
+
 
 class B43ManifestTests(unittest.TestCase):
     """Verify evidence and repeatability behavior."""

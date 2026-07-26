@@ -80,6 +80,22 @@ REQUIRED_ATTRIBUTE_LINES = (
     "*.xlsx binary",
 )
 
+LOCAL_VERIFICATION_TERMS = (
+    "385291e61e45f6a470e6448124160d841fb1e2a7",
+    "pass-01-20260726_105456",
+    "pass-02-20260726_110602",
+    "8eb7ff220836048dc51f88203753cadb30282c812823505cde652af5901a2a2a",
+    "a8c6bbedba2852f44514c4d24d3940328f5597ff35a64754452ce2a948115d34",
+    "C166109BF9F5F0C8E25ED84AB639D798406937A50EE76ACC7FE8323417C1AFB1",
+    "812A5506A1E20AF4A6A573FDD4FAFF0CBC42008F32C687AD9244BE08EA63400A",
+    "2C3620844C9070C9E940AE131B289193C17B566322C84C28106A11AF07CADCA1",
+    "F710709E6E82F212F5C8E7FEA1E0C5AB55FF9AFDDA933FF5C19821A0B684C31C",
+    "BA2EF5A93A3F8A9E042FB6840559F88E4A30C1905C0CF855EA721F8752673844",
+    "DCB46B2D38D04102FB7093A8478192B1A34734A5760C8EC2321948AE8CAD126B",
+    "1A139CFFADB8E16A7ED1CBDD115BE0DC1A7B46B9100661FE07F16291D8479EE8",
+    "781C485F2F7D0CF60C9D53941BD492EFF55BA99A13FBCDAD4ED9461F19D68316",
+)
+
 
 class VerificationError(RuntimeError):
     """B4.3 repository, evidence, or gate verification failure."""
@@ -336,6 +352,10 @@ def validate_lifecycle_record(path: Path) -> dict:
         "parent_baseline": (
             "196c46e5b90b568f8639a061e4dc5370db57c091"
         ),
+        "local_verified": "2026-07-26",
+        "local_verified_commit": (
+            "385291e61e45f6a470e6448124160d841fb1e2a7"
+        ),
     }
     for name, expected_value in expected.items():
         if metadata.get(name) != expected_value:
@@ -379,6 +399,13 @@ def validate_lifecycle_record(path: Path) -> dict:
         if term not in body:
             raise VerificationError(
                 "B4.3 lifecycle record omits required content: "
+                + term
+            )
+
+    for term in LOCAL_VERIFICATION_TERMS:
+        if term not in body:
+            raise VerificationError(
+                "B4.3 lifecycle record omits local evidence identity: "
                 + term
             )
 
