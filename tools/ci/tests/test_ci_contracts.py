@@ -14,6 +14,7 @@ from typing import Sequence
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+GIT_ATTRIBUTES_PATH = REPO_ROOT / ".gitattributes"
 
 CHECK_FORMAT_PATH = (
     REPO_ROOT / "tools" / "ci" / "check_format.py"
@@ -24,6 +25,7 @@ CHECK_CLANG_TIDY_PATH = (
 )
 
 CI_TEXT_FILES = (
+    GIT_ATTRIBUTES_PATH,
     REPO_ROOT / ".clang-format",
     REPO_ROOT / ".clang-tidy",
     REPO_ROOT / ".editorconfig",
@@ -180,6 +182,115 @@ class CiTextContractTests(unittest.TestCase):
                     data.endswith(b"\n"),
                     f"Missing final newline: {path}",
                 )
+
+
+class GitCheckoutPolicyTests(unittest.TestCase):
+    """Verify deterministic checkout behavior across Windows Git settings."""
+
+    CONTROLLED_LF_PATHS = (
+        ".gitattributes",
+        ".clang-format",
+        ".clang-tidy",
+        ".editorconfig",
+        "tools/ci/requirements-ci.txt",
+        "tools/ci/tests/test_ci_contracts.py",
+        (
+            "tools/scripts/"
+            "B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
+        ),
+    )
+
+    def test_repository_attributes_force_lf_for_controlled_text(
+        self,
+    ) -> None:
+        output = run_git(
+            REPO_ROOT,
+            (
+                "check-attr",
+                "eol",
+                "--",
+                *self.CONTROLLED_LF_PATHS,
+            ),
+        )
+        resolved = {}
+        for line in output.splitlines():
+            relative_path, attribute, value = line.rsplit(
+                ": ",
+                maxsplit=2,
+            )
+            self.assertEqual(attribute, "eol")
+            resolved[relative_path] = value
+
+        self.assertEqual(
+            resolved,
+            {
+                relative_path: "lf"
+                for relative_path in self.CONTROLLED_LF_PATHS
+            },
+        )
+
+    def test_clean_clone_preserves_lf_with_autocrlf_enabled(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            temporary_root = Path(temporary_directory).resolve()
+            source_root = temporary_root / "source"
+            clone_root = temporary_root / "clone"
+
+            initialize_git_repository(source_root)
+            write_text(
+                source_root / ".gitattributes",
+                GIT_ATTRIBUTES_PATH.read_text(encoding="utf-8"),
+            )
+
+            controlled_files = {
+                ".clang-format": "---\nLanguage: Cpp\n...\n",
+                ".clang-tidy": "---\nChecks: '-*'\n...\n",
+                ".editorconfig": (
+                    "root = true\n\n"
+                    "[*]\n"
+                    "end_of_line = lf\n"
+                ),
+                "tools/ci/requirements-ci.txt": (
+                    "clang-format==22.1.8\n"
+                ),
+            }
+            for relative_path, content in controlled_files.items():
+                write_text(source_root / relative_path, content)
+
+            run_git(source_root, ("add", "."))
+            run_git(
+                source_root,
+                ("commit", "--quiet", "-m", "fixture"),
+            )
+
+            result = subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "core.autocrlf=true",
+                    "clone",
+                    "--quiet",
+                    str(source_root),
+                    str(clone_root),
+                ],
+                cwd=temporary_root,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                msg=(result.stderr or result.stdout).strip(),
+            )
+
+            for relative_path in controlled_files:
+                with self.subTest(relative_path=relative_path):
+                    data = (clone_root / relative_path).read_bytes()
+                    self.assertNotIn(b"\r", data)
+                    self.assertTrue(data.endswith(b"\n"))
 
 
 class FormatSourceDiscoveryTests(unittest.TestCase):

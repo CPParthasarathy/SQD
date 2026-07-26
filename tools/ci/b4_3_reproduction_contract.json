@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "work_package": "B4.3",
+  "gate": "G-B",
+  "repository": "https://github.com/CPParthasarathy/SQD.git",
+  "parent_baseline": "196c46e5b90b568f8639a061e4dc5370db57c091",
+  "orchestrator_path": "tools/scripts/B4.3_Reproduce_Clean_Checkout_To_Flash.ps1",
+  "toolchain": {
+    "esp_idf_version": "v6.0.2",
+    "esp_idf_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "python_version": "Python 3.11.15",
+    "target": "esp32s3"
+  },
+  "hardware": {
+    "compatibility": "heltec-wifi-lora-32-v3",
+    "serial_baud": 115200,
+    "serial_device_patterns": [
+      "CP210x",
+      "Silicon Labs"
+    ]
+  },
+  "build": {
+    "default_profile": "validation",
+    "allowed_profiles": [
+      "debug",
+      "validation"
+    ],
+    "existing_build_reuse_permitted": false
+  },
+  "repeatability": {
+    "required_passes": 2,
+    "clone_reuse_permitted": false,
+    "build_directory_reuse_permitted": false
+  },
+  "required_serial_markers": [
+    "B1.2 minimal firmware started",
+    "Heartbeat:",
+    "SQD_META schema=1"
+  ],
+  "forbidden_serial_patterns": [
+    "Guru Meditation Error",
+    "Brownout detector was triggered",
+    "invalid header",
+    "partition table error",
+    "abort()"
+  ],
+  "required_metadata_keys": [
+    "product_version",
+    "git_commit",
+    "git_commit_short",
+    "git_dirty",
+    "source_timestamp_utc",
+    "build_timestamp_utc",
+    "build_profile",
+    "target",
+    "idf_version",
+    "compiler_version",
+    "hardware_compatibility",
+    "secure_version",
+    "elf_sha256"
+  ],
+  "required_inherited_controls": [
+    "tools/scripts/B1.3_Verify_Workstation.ps1",
+    "tools/scripts/B3.2_Common.ps1",
+    "tools/scripts/B3.2_Build.ps1",
+    "tools/scripts/B3.2_Erase.ps1",
+    "tools/scripts/B3.2_Flash.ps1",
+    "tools/scripts/B3.2_Monitor.ps1",
+    "tools/scripts/B3.3_Common.ps1",
+    "tools/scripts/B3.3_ToolchainGuard.ps1",
+    "tools/ci/run_host_tests.py",
+    "tools/ci/run_profile_build.ps1",
+    "tools/ci/artifact_archive.py",
+    "tools/ci/artifact_archive_contract.json",
+    "tools/ci/verify_b4_2.py"
+  ],
+  "required_evidence_roles": [
+    "clean-clone-identity",
+    "workstation-verification",
+    "toolchain-identity",
+    "host-tests",
+    "b4.2-contract",
+    "controlled-build",
+    "erase-flash",
+    "serial-monitor",
+    "firmware-metadata",
+    "reproduction-results"
+  ]
+}
