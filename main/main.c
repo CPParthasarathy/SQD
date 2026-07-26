@@ -7,6 +7,7 @@
 #include "esp_system.h"
 
 #include "sdkconfig.h"
+#include "sqd_build_metadata.h"
 
 static const char *TAG = "B1.2";
 
@@ -16,6 +17,7 @@ void app_main(void) {
     ESP_LOGI(TAG, "B1.2 minimal firmware started");
     ESP_LOGI(TAG, "ESP-IDF version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Configured target: %s", CONFIG_IDF_TARGET);
+    sqd_build_metadata_log();
 
     while (true) {
         ESP_LOGI(TAG, "Heartbeat: %" PRIu32, heartbeat++);
