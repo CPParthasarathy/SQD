@@ -25,8 +25,10 @@ RECORD_RELATIVE_PATH = Path(
     "docs/phase-b/"
     "B4.3_Clean_Checkout_To_Flash_and_Cluster_B_Gate.md"
 )
+GIT_ATTRIBUTES_RELATIVE_PATH = Path(".gitattributes")
 
 FOUNDATION_PATHS = (
+    GIT_ATTRIBUTES_RELATIVE_PATH,
     Path("main/CMakeLists.txt"),
     Path("main/main.c"),
     CONTRACT_RELATIVE_PATH,
@@ -52,6 +54,31 @@ EXPECTED_CONTRACT = {
         "B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
     ),
 }
+
+
+REQUIRED_LF_ATTRIBUTE_PATHS = (
+    ".gitattributes",
+    ".clang-format",
+    ".clang-tidy",
+    ".editorconfig",
+    "tools/ci/requirements-ci.txt",
+    "tools/ci/tests/test_ci_contracts.py",
+    (
+        "tools/scripts/"
+        "B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
+    ),
+)
+
+REQUIRED_ATTRIBUTE_LINES = (
+    "* text=auto eol=lf",
+    "*.ps1 text eol=lf",
+    "*.cmd text eol=crlf",
+    "*.bat text eol=crlf",
+    "*.bin binary",
+    "*.elf binary",
+    "*.pdf binary",
+    "*.xlsx binary",
+)
 
 
 class VerificationError(RuntimeError):
@@ -382,6 +409,70 @@ def run_git(
     return result.stdout.strip()
 
 
+def validate_checkout_policy(repo_root: Path) -> None:
+    """Validate deterministic cross-platform Git checkout attributes."""
+
+    attributes_path = repo_root / GIT_ATTRIBUTES_RELATIVE_PATH
+    data = attributes_path.read_bytes()
+    if data.startswith(b"\xef\xbb\xbf"):
+        raise VerificationError(
+            ".gitattributes must not contain a UTF-8 BOM."
+        )
+    if b"\r" in data:
+        raise VerificationError(
+            ".gitattributes must use LF line endings."
+        )
+    if not data.endswith(b"\n"):
+        raise VerificationError(
+            ".gitattributes must end with a newline."
+        )
+
+    lines = {
+        line.strip()
+        for line in data.decode("utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    }
+    for required_line in REQUIRED_ATTRIBUTE_LINES:
+        if required_line not in lines:
+            raise VerificationError(
+                "Missing deterministic checkout attribute: "
+                + required_line
+            )
+
+    output = run_git(
+        repo_root,
+        [
+            "check-attr",
+            "eol",
+            "--",
+            *REQUIRED_LF_ATTRIBUTE_PATHS,
+        ],
+    )
+    resolved: dict[str, str] = {}
+    for line in output.splitlines():
+        try:
+            relative_path, attribute, value = line.rsplit(
+                ": ",
+                maxsplit=2,
+            )
+        except ValueError as error:
+            raise VerificationError(
+                f"Invalid git check-attr output: {line!r}"
+            ) from error
+        if attribute != "eol":
+            raise VerificationError(
+                f"Unexpected Git attribute field: {attribute!r}"
+            )
+        resolved[relative_path] = value
+
+    for relative_path in REQUIRED_LF_ATTRIBUTE_PATHS:
+        if resolved.get(relative_path) != "lf":
+            raise VerificationError(
+                "Git checkout policy does not force LF for "
+                f"{relative_path}: {resolved.get(relative_path)!r}"
+            )
+
+
 def validate_repository(repo_root: Path) -> tuple[dict, dict]:
     """Validate static B4.3 repository contracts."""
 
@@ -393,6 +484,8 @@ def validate_repository(repo_root: Path) -> tuple[dict, dict]:
                 f"Required B4.3 foundation file is missing: "
                 f"{relative_path.as_posix()}"
             )
+
+    validate_checkout_policy(repo_root)
 
     contract = validate_contract(
         repo_root / CONTRACT_RELATIVE_PATH
@@ -992,6 +1085,7 @@ def main() -> int:
         print(f"Parent baseline: {contract['parent_baseline']}")
         print(f"Lifecycle:       {lifecycle['status']}")
         print("Firmware metadata logging: PASS")
+        print("Deterministic checkout policy: PASS")
         print("Inherited control inventory: PASS")
         print("Contract schema: PASS")
 
