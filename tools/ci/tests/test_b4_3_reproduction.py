@@ -19,6 +19,12 @@ CONTRACT_PATH = (
     / "ci"
     / "b4_3_reproduction_contract.json"
 )
+ORCHESTRATOR_PATH = (
+    REPO_ROOT
+    / "tools"
+    / "scripts"
+    / "B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
+)
 RECORD_PATH = (
     REPO_ROOT
     / "docs"
@@ -71,6 +77,7 @@ class B43TextFileTests(unittest.TestCase):
             VERIFY_PATH,
             CONTRACT_PATH,
             RECORD_PATH,
+            ORCHESTRATOR_PATH,
             Path(__file__).resolve(),
         ):
             data = path.read_bytes()
@@ -90,6 +97,31 @@ class B43RepositoryContractTests(unittest.TestCase):
         self.assertIn(
             lifecycle["status"],
             {"In Progress", "Accepted"},
+        )
+
+    def test_orchestrator_declares_controlled_boundaries(
+        self,
+    ) -> None:
+        text = ORCHESTRATOR_PATH.read_text(encoding="utf-8")
+        for term in (
+            "[switch]$ConfirmHardwareOperations",
+            "[switch]$PlanOnly",
+            "Resolve-B43SerialPort",
+            "B1.3_Verify_Workstation.ps1",
+            "B3.3_ToolchainGuard.ps1",
+            "B3.2_Build.ps1",
+            "B3.2_Erase.ps1",
+            "B3.2_Flash.ps1",
+            "B3.2_Monitor.ps1",
+            "run_host_tests.py",
+            "verify_b4_2.py",
+            "SHA256SUMS.txt",
+        ):
+            with self.subTest(term=term):
+                self.assertIn(term, text)
+        self.assertNotRegex(
+            text,
+            r'(?i)["\']COM[0-9]+["\']',
         )
 
     def test_rejects_incorrect_parent_baseline(self) -> None:

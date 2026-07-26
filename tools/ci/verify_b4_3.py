@@ -32,6 +32,10 @@ FOUNDATION_PATHS = (
     CONTRACT_RELATIVE_PATH,
     Path("tools/ci/verify_b4_3.py"),
     Path("tools/ci/tests/test_b4_3_reproduction.py"),
+    Path(
+        "tools/scripts/"
+        "B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
+    ),
     RECORD_RELATIVE_PATH,
 )
 
@@ -422,6 +426,36 @@ def validate_repository(repo_root: Path) -> tuple[dict, dict]:
     if "sqd_build_metadata_log();" not in main_c:
         raise VerificationError(
             "main firmware does not log build metadata."
+        )
+
+    orchestrator_path = repo_root / str(
+        contract["orchestrator_path"]
+    )
+    orchestrator = orchestrator_path.read_text(encoding="utf-8")
+    required_orchestrator_terms = (
+        "ConfirmHardwareOperations",
+        "PlanOnly",
+        "Resolve-B43SerialPort",
+        "B1.3_Verify_Workstation.ps1",
+        "B3.3_ToolchainGuard.ps1",
+        "B3.2_Build.ps1",
+        "B3.2_Erase.ps1",
+        "B3.2_Flash.ps1",
+        "B3.2_Monitor.ps1",
+        "run_host_tests.py",
+        "verify_b4_2.py",
+        "SHA256SUMS.txt",
+        "B4.3_reproduction_manifest_",
+    )
+    for term in required_orchestrator_terms:
+        if term not in orchestrator:
+            raise VerificationError(
+                "B4.3 orchestrator omits required control: "
+                + term
+            )
+    if re.search(r'(?i)["\']COM[0-9]+["\']', orchestrator):
+        raise VerificationError(
+            "B4.3 orchestrator must not hard-code a COM port."
         )
 
     git_root = run_git(
