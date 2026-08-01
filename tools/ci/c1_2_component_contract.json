@@ -1,0 +1,371 @@
+{
+    "schema_version":  1,
+    "work_package":  "C1.2",
+    "status":  "Draft",
+    "parent_baseline":  "10ddce93560c94127933f5d6e08f7f6b546f5dc8",
+    "specification_document":  "docs/phase-c/C1.2_Component_Interface_and_Runtime_Contracts.md",
+    "completion_criterion":  "Every mutable resource and interface has a single owner.",
+    "components":  [
+                       {
+                           "id":  "main",
+                           "path":  "main",
+                           "layer":  "composition-root",
+                           "implementation_status":  "existing",
+                           "api_namespace":  "app_main",
+                           "execution_model":  "composition-root",
+                           "owned_resource_ids":  [
+
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "app",
+                                                          "build_metadata"
+                                                      ]
+                       },
+                       {
+                           "id":  "app",
+                           "path":  "components/app",
+                           "layer":  "product-application",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_app_*",
+                           "execution_model":  "supervised-active-coordinator",
+                           "owned_resource_ids":  [
+                                                      "product_orchestration_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "domain",
+                                                          "connectivity",
+                                                          "update"
+                                                      ]
+                       },
+                       {
+                           "id":  "domain",
+                           "path":  "components/domain",
+                           "layer":  "product-services",
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_domain_*",
+                           "execution_model":  "passive",
+                           "owned_resource_ids":  [
+                                                      "domain_model_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "connectivity",
+                           "path":  "components/connectivity",
+                           "layer":  "product-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_connectivity_*",
+                           "execution_model":  "supervised-state-machine",
+                           "owned_resource_ids":  [
+                                                      "connectivity_session_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "update",
+                           "path":  "components/update",
+                           "layer":  "product-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_update_*",
+                           "execution_model":  "supervised-state-machine",
+                           "owned_resource_ids":  [
+                                                      "update_transaction_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "platform",
+                           "path":  "components/platform",
+                           "layer":  "platform-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_platform_*",
+                           "execution_model":  "passive",
+                           "owned_resource_ids":  [
+                                                      "platform_capability_registry"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "device_drivers",
+                                                          "hal"
+                                                      ]
+                       },
+                       {
+                           "id":  "services",
+                           "path":  "components/services",
+                           "layer":  "platform-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_services_*",
+                           "execution_model":  "supervisor-owned-workers",
+                           "owned_resource_ids":  [
+                                                      "service_registry_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "device_drivers",
+                                                          "hal"
+                                                      ]
+                       },
+                       {
+                           "id":  "storage",
+                           "path":  "components/storage",
+                           "layer":  "platform-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_storage_*",
+                           "execution_model":  "passive-serialized",
+                           "owned_resource_ids":  [
+                                                      "persistent_storage_runtime"
+                                                  ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "security",
+                           "path":  "components/security",
+                           "layer":  "platform-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_security_*",
+                           "execution_model":  "passive-serialized",
+                           "owned_resource_ids":  [
+                                                      "security_runtime_state"
+                                                  ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "diagnostics",
+                           "path":  "components/diagnostics",
+                           "layer":  "platform-services",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_diagnostics_*",
+                           "execution_model":  "passive-with-nonblocking-ingress",
+                           "owned_resource_ids":  [
+                                                      "diagnostic_runtime_state"
+                                                  ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "device_drivers",
+                           "path":  "components/device_drivers",
+                           "layer":  "hardware-abstraction-device-drivers",
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_\u003cdevice\u003e_*",
+                           "execution_model":  "passive-owner-serialized",
+                           "owned_resource_ids":  [
+                                                      "device_instance_state"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "hal",
+                                                          "board"
+                                                      ]
+                       },
+                       {
+                           "id":  "hal",
+                           "path":  "components/hal",
+                           "layer":  "hardware-abstraction-generic-hal",
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_hal_\u003cperipheral\u003e_*",
+                           "execution_model":  "passive-with-controlled-interrupt-boundary",
+                           "owned_resource_ids":  [
+                                                      "peripheral_runtime_handles"
+                                                  ],
+                           "permitted_dependencies":  [
+                                                          "board"
+                                                      ]
+                       },
+                       {
+                           "id":  "board",
+                           "path":  "components/board",
+                           "layer":  "board-and-hardware-foundation",
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_board_*",
+                           "execution_model":  "passive",
+                           "owned_resource_ids":  [
+                                                      "board_runtime_state"
+                                                  ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "build_metadata",
+                           "path":  "components/build_metadata",
+                           "layer":  "controlled-cross-cutting-leaf",
+                           "implementation_status":  "existing",
+                           "api_namespace":  "sqd_build_metadata_*",
+                           "execution_model":  "immutable-read-only",
+                           "owned_resource_ids":  [
+
+                                                  ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       }
+                   ],
+    "mutable_resources":  [
+                              {
+                                  "id":  "product_orchestration_state",
+                                  "owner":  "app",
+                                  "description":  "Top-level product lifecycle and orchestration state."
+                              },
+                              {
+                                  "id":  "domain_model_state",
+                                  "owner":  "domain",
+                                  "description":  "Validated domain models, product rules and transitions."
+                              },
+                              {
+                                  "id":  "connectivity_session_state",
+                                  "owner":  "connectivity",
+                                  "description":  "Connectivity session and protocol workflow state."
+                              },
+                              {
+                                  "id":  "update_transaction_state",
+                                  "owner":  "update",
+                                  "description":  "Active OTA transaction, verification and commit state."
+                              },
+                              {
+                                  "id":  "platform_capability_registry",
+                                  "owner":  "platform",
+                                  "description":  "Board-independent runtime capability registry."
+                              },
+                              {
+                                  "id":  "service_registry_state",
+                                  "owner":  "services",
+                                  "description":  "Service registration and lifecycle supervision state."
+                              },
+                              {
+                                  "id":  "persistent_storage_runtime",
+                                  "owner":  "storage",
+                                  "description":  "NVS, filesystem and persistent transaction handles."
+                              },
+                              {
+                                  "id":  "security_runtime_state",
+                                  "owner":  "security",
+                                  "description":  "Credential references, cryptographic contexts and secure state."
+                              },
+                              {
+                                  "id":  "diagnostic_runtime_state",
+                                  "owner":  "diagnostics",
+                                  "description":  "Fault ring, health snapshot and diagnostic counters."
+                              },
+                              {
+                                  "id":  "device_instance_state",
+                                  "owner":  "device_drivers",
+                                  "description":  "Device-instance and device-protocol state."
+                              },
+                              {
+                                  "id":  "peripheral_runtime_handles",
+                                  "owner":  "hal",
+                                  "description":  "Peripheral handles, interrupt bindings and bus serialization."
+                              },
+                              {
+                                  "id":  "board_runtime_state",
+                                  "owner":  "board",
+                                  "description":  "Board detection and safe-board-preparation state."
+                              }
+                          ],
+    "approved_same_level_dependencies":  [
+
+                                         ],
+    "interface_rules":  {
+                            "public_namespace":  "sqd_",
+                            "component_namespace_pattern":  "sqd_\u003ccomponent\u003e_",
+                            "single_interface_owner_required":  true,
+                            "single_mutable_resource_owner_required":  true,
+                            "explicit_dependency_injection":  true,
+                            "hidden_singleton_dependencies_forbidden":  true,
+                            "opaque_mutable_contexts":  true,
+                            "native_handle_escape_forbidden":  true,
+                            "esp_err_t_above_owner_boundary_forbidden":  true,
+                            "caller_owned_buffer_default":  true,
+                            "failed_transfer_retains_caller_ownership":  true,
+                            "allocator_provides_release_operation":  true,
+                            "same_level_dependency_requires_c1_3":  true
+                        },
+    "lifecycle":  {
+                      "states":  [
+                                     "UNINITIALIZED",
+                                     "INITIALIZED",
+                                     "STARTING",
+                                     "RUNNING",
+                                     "STOPPING",
+                                     "STOPPED",
+                                     "FAULTED"
+                                 ],
+                      "standard_operations":  [
+                                                  "init",
+                                                  "start",
+                                                  "stop",
+                                                  "deinit",
+                                                  "get_status"
+                                              ],
+                      "repeated_compatible_init":  "idempotent-or-SQD_STATUS_ALREADY_INITIALIZED",
+                      "conflicting_init_result":  "SQD_STATUS_INVALID_STATE",
+                      "partial_initialization_rollback_required":  true,
+                      "caller_dependencies_released_by_component":  false,
+                      "system_sequence_owner":  "C5"
+                  },
+    "threading":  {
+                      "passive_by_default":  true,
+                      "unregistered_task_creation_forbidden":  true,
+                      "active_execution_owner":  "services-supervision-model",
+                      "task_dimensioning_owner":  "C6",
+                      "isr_registration_owners":  [
+                                                      "hal",
+                                                      "board"
+                                                  ],
+                      "allocation_in_isr_forbidden":  true,
+                      "blocking_in_isr_forbidden":  true,
+                      "persistent_storage_in_isr_forbidden":  true,
+                      "product_policy_in_isr_forbidden":  true,
+                      "unbounded_logging_in_isr_forbidden":  true
+                  },
+    "errors":  {
+                   "cross_component_type":  "sqd_status_t",
+                   "status_codes":  [
+                                        "SQD_STATUS_OK",
+                                        "SQD_STATUS_INVALID_ARGUMENT",
+                                        "SQD_STATUS_INVALID_STATE",
+                                        "SQD_STATUS_ALREADY_INITIALIZED",
+                                        "SQD_STATUS_NOT_FOUND",
+                                        "SQD_STATUS_BUSY",
+                                        "SQD_STATUS_TIMEOUT",
+                                        "SQD_STATUS_IO",
+                                        "SQD_STATUS_INTEGRITY",
+                                        "SQD_STATUS_AUTHORIZATION",
+                                        "SQD_STATUS_NO_MEMORY",
+                                        "SQD_STATUS_NOT_SUPPORTED",
+                                        "SQD_STATUS_CANCELLED",
+                                        "SQD_STATUS_INTERNAL"
+                                    ],
+                   "native_error_translation_required":  true,
+                   "esp_err_t_above_owner_boundary_forbidden":  true,
+                   "invalid_input_checked_before_state_change":  true,
+                   "timeout_and_cancellation_distinct":  true,
+                   "authorization_distinct_from_io":  true,
+                   "integrity_distinct_from_not_found":  true,
+                   "silent_log_and_continue_forbidden":  true,
+                   "secret_disclosure_forbidden":  true,
+                   "retry_policy_owner":  "caller-or-product-policy-owner",
+                   "fatality_and_safe_mode_policy_owner":  "C5"
+               }
+}
