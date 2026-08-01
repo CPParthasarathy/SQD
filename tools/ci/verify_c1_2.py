@@ -202,7 +202,7 @@ def verify_contract(contract: dict[str, Any]) -> tuple[int, int]:
     expected_identity = {
         "schema_version": 1,
         "work_package": "C1.2",
-        "status": "Draft",
+        "status": "Accepted",
         "parent_baseline": "10ddce93560c94127933f5d6e08f7f6b546f5dc8",
         "specification_document": (
             "docs/phase-c/C1.2_Component_Interface_and_Runtime_Contracts.md"
