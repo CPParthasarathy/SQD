@@ -1,0 +1,366 @@
+{
+    "schema_version":  2,
+    "work_package":  "C1.3",
+    "status":  "Draft",
+    "gate":  "G-C",
+    "parent_baseline":  "77407888f4b5758561168a4507294a939e518c7d",
+    "parent_documents":  [
+                             "docs/phase-c/C1.1_System_Architecture.md",
+                             "docs/phase-c/C1.2_Component_Interface_and_Runtime_Contracts.md"
+                         ],
+    "source_contract":  "tools/ci/c1_2_component_contract.json",
+    "source_blobs":  {
+                         "c1_1_document":  "fc81cc613d1f403ca428305a57bc3a0cce065fef",
+                         "c1_2_document":  "f450cb1c40a86fddfdfebf840dc24ba29b2c15a3",
+                         "c1_2_contract":  "e75c73002745afadf8653920e4afc2fa42247373"
+                     },
+    "completion_criterion":  "No circular dependencies or overlapping responsibilities remain.",
+    "dependency_semantics":  "permitted_dependencies is the accepted C1.2 allowlist; verification treats the complete allowlist conservatively as a graph.",
+    "layer_order":  [
+                        {
+                            "id":  "composition-root",
+                            "rank":  0
+                        },
+                        {
+                            "id":  "product-application",
+                            "rank":  1
+                        },
+                        {
+                            "id":  "product-services",
+                            "rank":  2
+                        },
+                        {
+                            "id":  "platform-services",
+                            "rank":  3
+                        },
+                        {
+                            "id":  "hardware-abstraction-device-drivers",
+                            "rank":  4
+                        },
+                        {
+                            "id":  "hardware-abstraction-generic-hal",
+                            "rank":  5
+                        },
+                        {
+                            "id":  "board-and-hardware-foundation",
+                            "rank":  6
+                        },
+                        {
+                            "id":  "controlled-cross-cutting-leaf",
+                            "rank":  7
+                        }
+                    ],
+    "components":  [
+                       {
+                           "id":  "main",
+                           "path":  "main",
+                           "layer":  "composition-root",
+                           "layer_rank":  0,
+                           "implementation_status":  "existing",
+                           "api_namespace":  "app_main",
+                           "execution_model":  "composition-root",
+                           "owns":  [
+
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "app",
+                                                          "build_metadata"
+                                                      ]
+                       },
+                       {
+                           "id":  "app",
+                           "path":  "components/app",
+                           "layer":  "product-application",
+                           "layer_rank":  1,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_app_*",
+                           "execution_model":  "supervised-active-coordinator",
+                           "owns":  [
+                                        "product_orchestration_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "domain",
+                                                          "connectivity",
+                                                          "update"
+                                                      ]
+                       },
+                       {
+                           "id":  "domain",
+                           "path":  "components/domain",
+                           "layer":  "product-services",
+                           "layer_rank":  2,
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_domain_*",
+                           "execution_model":  "passive",
+                           "owns":  [
+                                        "domain_model_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "connectivity",
+                           "path":  "components/connectivity",
+                           "layer":  "product-services",
+                           "layer_rank":  2,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_connectivity_*",
+                           "execution_model":  "supervised-state-machine",
+                           "owns":  [
+                                        "connectivity_session_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "update",
+                           "path":  "components/update",
+                           "layer":  "product-services",
+                           "layer_rank":  2,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_update_*",
+                           "execution_model":  "supervised-state-machine",
+                           "owns":  [
+                                        "update_transaction_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "platform",
+                                                          "services",
+                                                          "storage",
+                                                          "security",
+                                                          "diagnostics"
+                                                      ]
+                       },
+                       {
+                           "id":  "platform",
+                           "path":  "components/platform",
+                           "layer":  "platform-services",
+                           "layer_rank":  3,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_platform_*",
+                           "execution_model":  "passive",
+                           "owns":  [
+                                        "platform_capability_registry"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "device_drivers",
+                                                          "hal"
+                                                      ]
+                       },
+                       {
+                           "id":  "services",
+                           "path":  "components/services",
+                           "layer":  "platform-services",
+                           "layer_rank":  3,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_services_*",
+                           "execution_model":  "supervisor-owned-workers",
+                           "owns":  [
+                                        "service_registry_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "device_drivers",
+                                                          "hal"
+                                                      ]
+                       },
+                       {
+                           "id":  "storage",
+                           "path":  "components/storage",
+                           "layer":  "platform-services",
+                           "layer_rank":  3,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_storage_*",
+                           "execution_model":  "passive-serialized",
+                           "owns":  [
+                                        "persistent_storage_runtime"
+                                    ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "security",
+                           "path":  "components/security",
+                           "layer":  "platform-services",
+                           "layer_rank":  3,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_security_*",
+                           "execution_model":  "passive-serialized",
+                           "owns":  [
+                                        "security_runtime_state"
+                                    ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "diagnostics",
+                           "path":  "components/diagnostics",
+                           "layer":  "platform-services",
+                           "layer_rank":  3,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_diagnostics_*",
+                           "execution_model":  "passive-with-nonblocking-ingress",
+                           "owns":  [
+                                        "diagnostic_runtime_state"
+                                    ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "device_drivers",
+                           "path":  "components/device_drivers",
+                           "layer":  "hardware-abstraction-device-drivers",
+                           "layer_rank":  4,
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_\u003cdevice\u003e_*",
+                           "execution_model":  "passive-owner-serialized",
+                           "owns":  [
+                                        "device_instance_state"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "hal",
+                                                          "board"
+                                                      ]
+                       },
+                       {
+                           "id":  "hal",
+                           "path":  "components/hal",
+                           "layer":  "hardware-abstraction-generic-hal",
+                           "layer_rank":  5,
+                           "implementation_status":  "planned",
+                           "api_namespace":  "sqd_hal_\u003cperipheral\u003e_*",
+                           "execution_model":  "passive-with-controlled-interrupt-boundary",
+                           "owns":  [
+                                        "peripheral_runtime_handles"
+                                    ],
+                           "permitted_dependencies":  [
+                                                          "board"
+                                                      ]
+                       },
+                       {
+                           "id":  "board",
+                           "path":  "components/board",
+                           "layer":  "board-and-hardware-foundation",
+                           "layer_rank":  6,
+                           "implementation_status":  "existing-skeleton",
+                           "api_namespace":  "sqd_board_*",
+                           "execution_model":  "passive",
+                           "owns":  [
+                                        "board_runtime_state"
+                                    ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       },
+                       {
+                           "id":  "build_metadata",
+                           "path":  "components/build_metadata",
+                           "layer":  "controlled-cross-cutting-leaf",
+                           "layer_rank":  7,
+                           "implementation_status":  "existing",
+                           "api_namespace":  "sqd_build_metadata_*",
+                           "execution_model":  "immutable-read-only",
+                           "owns":  [
+
+                                    ],
+                           "permitted_dependencies":  [
+
+                                                      ]
+                       }
+                   ],
+    "mutable_resources":  [
+                              {
+                                  "id":  "product_orchestration_state",
+                                  "owner":  "app",
+                                  "description":  "Top-level product lifecycle and orchestration state."
+                              },
+                              {
+                                  "id":  "domain_model_state",
+                                  "owner":  "domain",
+                                  "description":  "Validated domain models, product rules and transitions."
+                              },
+                              {
+                                  "id":  "connectivity_session_state",
+                                  "owner":  "connectivity",
+                                  "description":  "Connectivity session and protocol workflow state."
+                              },
+                              {
+                                  "id":  "update_transaction_state",
+                                  "owner":  "update",
+                                  "description":  "Active OTA transaction, verification and commit state."
+                              },
+                              {
+                                  "id":  "platform_capability_registry",
+                                  "owner":  "platform",
+                                  "description":  "Board-independent runtime capability registry."
+                              },
+                              {
+                                  "id":  "service_registry_state",
+                                  "owner":  "services",
+                                  "description":  "Service registration and lifecycle supervision state."
+                              },
+                              {
+                                  "id":  "persistent_storage_runtime",
+                                  "owner":  "storage",
+                                  "description":  "NVS, filesystem and persistent transaction handles."
+                              },
+                              {
+                                  "id":  "security_runtime_state",
+                                  "owner":  "security",
+                                  "description":  "Credential references, cryptographic contexts and secure state."
+                              },
+                              {
+                                  "id":  "diagnostic_runtime_state",
+                                  "owner":  "diagnostics",
+                                  "description":  "Fault ring, health snapshot and diagnostic counters."
+                              },
+                              {
+                                  "id":  "device_instance_state",
+                                  "owner":  "device_drivers",
+                                  "description":  "Device-instance and device-protocol state."
+                              },
+                              {
+                                  "id":  "peripheral_runtime_handles",
+                                  "owner":  "hal",
+                                  "description":  "Peripheral handles, interrupt bindings and bus serialization."
+                              },
+                              {
+                                  "id":  "board_runtime_state",
+                                  "owner":  "board",
+                                  "description":  "Board detection and safe-board-preparation state."
+                              }
+                          ],
+    "approved_same_level_dependencies":  [
+
+                                         ],
+    "architecture_decisions":  [
+
+                               ],
+    "rejected_recovered_candidates":  [
+                                          {
+                                              "candidate":  "ADR-0001",
+                                              "decision":  "diagnostics to services and storage lateral dependencies",
+                                              "disposition":  "Rejected",
+                                              "rationale":  "Accepted C1.2 declares no diagnostics dependency and approves no same-level dependency."
+                                          },
+                                          {
+                                              "candidate":  "ADR-0002",
+                                              "decision":  "platform to HAL same-layer waiver",
+                                              "disposition":  "Rejected",
+                                              "rationale":  "Platform services to HAL is downward, and device-drivers to HAL is an ordered hardware-abstraction sublayer dependency."
+                                          }
+                                      ],
+    "gate_status":  "PENDING_VERIFICATION"
+}

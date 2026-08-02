@@ -1,0 +1,68 @@
+C1.3 repository host-test evidence
+Timestamp: 20260802_125438
+Work package: C1.3
+Gate: G-C
+Branch: docs/c1.3-architecture-review-gate
+Parent baseline: 77407888f4b5758561168a4507294a939e518c7d
+Python: Python 3.11.15
+Runner: tools/ci/run_host_tests.py
+Expected tests: 38
+Architecture evidence: verification/c1_3_architecture/C1.3_verification_result_20260802_124543.json
+Architecture evidence SHA-256: F77E68B620C3D884A677469DD1C9DFB7095E0CC77B26D00F0CFFE3652B835180
+
+=== HOST-TEST OUTPUT ===
+B4.1 host tests
+Repository: D:\OneDrive\SQD
+Tests:      D:\OneDrive\SQD\tools\ci\tests
+
+test_b42_text_files_use_utf8_lf_and_final_newline (test_artifact_archive.B42TextFileTests.test_b42_text_files_use_utf8_lf_and_final_newline) ... ok
+test_profile_wrapper_captures_native_stderr (test_artifact_archive.B42TextFileTests.test_profile_wrapper_captures_native_stderr) ... ok
+test_complete_profile_matrix_passes (test_artifact_archive.B42VerificationTests.test_complete_profile_matrix_passes) ... ok
+test_incomplete_github_traceability_is_rejected (test_artifact_archive.B42VerificationTests.test_incomplete_github_traceability_is_rejected) ... ok
+test_missing_profile_archive_is_rejected (test_artifact_archive.B42VerificationTests.test_missing_profile_archive_is_rejected) ... ok
+test_repository_contract_passes (test_artifact_archive.B42VerificationTests.test_repository_contract_passes) ... ok
+test_profile_wrapper_returns_to_repository_before_cleanup (test_artifact_archive.B42WorktreeCleanupTests.test_profile_wrapper_returns_to_repository_before_cleanup) ... ok
+test_rejects_firmware_commit_mismatch (test_b4_3_reproduction.B43ManifestTests.test_rejects_firmware_commit_mismatch) ... ok
+test_rejects_reused_clone_root (test_b4_3_reproduction.B43ManifestTests.test_rejects_reused_clone_root) ... ok
+test_two_independent_manifests_pass (test_b4_3_reproduction.B43ManifestTests.test_two_independent_manifests_pass) ... ok
+test_orchestrator_declares_controlled_boundaries (test_b4_3_reproduction.B43RepositoryContractTests.test_orchestrator_declares_controlled_boundaries) ... ok
+test_rejects_incomplete_local_verification_record (test_b4_3_reproduction.B43RepositoryContractTests.test_rejects_incomplete_local_verification_record) ... ok
+test_rejects_incorrect_parent_baseline (test_b4_3_reproduction.B43RepositoryContractTests.test_rejects_incorrect_parent_baseline) ... ok
+test_repository_contract_passes (test_b4_3_reproduction.B43RepositoryContractTests.test_repository_contract_passes) ... ok
+test_b43_text_files_use_utf8_lf_and_final_newline (test_b4_3_reproduction.B43TextFileTests.test_b43_text_files_use_utf8_lf_and_final_newline) ... ok
+test_c1_2_files_use_utf8_lf_and_final_newline (test_c1_2_contract.C12TextFileTests.test_c1_2_files_use_utf8_lf_and_final_newline) ... ok
+test_repository_contract_passes (test_c1_2_contract.C12VerificationTests.test_repository_contract_passes) ... ok
+test_resource_owner_must_claim_resource (test_c1_2_contract.C12VerificationTests.test_resource_owner_must_claim_resource) ... ok
+test_unknown_component_dependency_is_rejected (test_c1_2_contract.C12VerificationTests.test_unknown_component_dependency_is_rejected) ... ok
+test_dependency_cycle_is_rejected (test_c1_3_architecture.C13ArchitectureVerifierTests.test_dependency_cycle_is_rejected) ... ok
+test_overlapping_resource_ownership_is_rejected (test_c1_3_architecture.C13ArchitectureVerifierTests.test_overlapping_resource_ownership_is_rejected) ... ok
+test_repository_contract_passes (test_c1_3_architecture.C13ArchitectureVerifierTests.test_repository_contract_passes) ... ok
+test_source_contract_blob_drift_is_rejected (test_c1_3_architecture.C13ArchitectureVerifierTests.test_source_contract_blob_drift_is_rejected) ... ok
+test_upward_dependency_is_rejected (test_c1_3_architecture.C13ArchitectureVerifierTests.test_upward_dependency_is_rejected) ... ok
+test_c1_3_files_use_utf8_lf_and_final_newline (test_c1_3_architecture.C13TextFileTests.test_c1_3_files_use_utf8_lf_and_final_newline) ... ok
+test_ci_text_files_use_utf8_lf_and_final_newline (test_ci_contracts.CiTextContractTests.test_ci_text_files_use_utf8_lf_and_final_newline) ... ok
+test_filters_to_repository_owned_translation_units (test_ci_contracts.ClangTidyCompilationDatabaseTests.test_filters_to_repository_owned_translation_units) ... ok
+test_rejects_database_without_owned_translation_units (test_ci_contracts.ClangTidyCompilationDatabaseTests.test_rejects_database_without_owned_translation_units) ... ok
+test_rejects_incorrect_database_filename (test_ci_contracts.ClangTidyCompilationDatabaseTests.test_rejects_incorrect_database_filename) ... ok
+test_resolves_database_directory_and_file_arguments (test_ci_contracts.ClangTidyCompilationDatabaseTests.test_resolves_database_directory_and_file_arguments) ... ok
+test_discovers_tracked_and_nonignored_untracked_sources (test_ci_contracts.FormatSourceDiscoveryTests.test_discovers_tracked_and_nonignored_untracked_sources) ... ok
+test_rejects_repository_without_owned_sources (test_ci_contracts.FormatSourceDiscoveryTests.test_rejects_repository_without_owned_sources) ... ok
+test_clean_clone_preserves_lf_with_autocrlf_enabled (test_ci_contracts.GitCheckoutPolicyTests.test_clean_clone_preserves_lf_with_autocrlf_enabled) ... ok
+test_repository_attributes_force_lf_for_controlled_text (test_ci_contracts.GitCheckoutPolicyTests.test_repository_attributes_force_lf_for_controlled_text) ... ok
+test_rejects_incomplete_profile_matrix (test_workflow_contract.WorkflowContractTests.test_rejects_incomplete_profile_matrix) ... ok
+test_rejects_write_permission (test_workflow_contract.WorkflowContractTests.test_rejects_write_permission) ... ok
+test_repository_workflow_passes_contract (test_workflow_contract.WorkflowContractTests.test_repository_workflow_passes_contract) ... ok
+test_workflow_files_use_utf8_lf_and_final_newline (test_workflow_contract.WorkflowFileContractTests.test_workflow_files_use_utf8_lf_and_final_newline) ... ok
+
+----------------------------------------------------------------------
+Ran 38 tests in 12.320s
+
+OK
+
+PASS: B4.1 host tests passed.
+=== HOST-TEST SUMMARY ===
+Exit code: 0
+Tests run: 38
+Tests passed: 38
+Tests failed: 0
+Overall result: PASS

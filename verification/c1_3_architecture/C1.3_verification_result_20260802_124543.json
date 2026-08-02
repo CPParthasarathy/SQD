@@ -1,0 +1,79 @@
+{
+    "Timestamp":  "20260802_124543",
+    "WorkPackage":  "C1.3",
+    "Gate":  "G-C",
+    "ContractPath":  "tools/ci/c1_architecture_contract.json",
+    "ContractSha256":  "C7044FE6C1493C105D531116D1C5968FF4CE0355A930841420560A19570B5E68",
+    "SourceContractPath":  "tools/ci/c1_2_component_contract.json",
+    "SourceContractBlob":  "e75c73002745afadf8653920e4afc2fa42247373",
+    "ReviewDocumentPath":  "docs/phase-c/C1.3_Architecture_Review_and_Gate.md",
+    "Checks":  [
+                   {
+                       "Category":  "Identity",
+                       "Check":  "C1.3 contract identity and state are valid",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Source",
+                       "Check":  "accepted source paths and blobs resolve",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Alignment",
+                       "Check":  "C1.3 components exactly match accepted C1.2",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Graph",
+                       "Check":  "all dependency targets resolve",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Graph",
+                       "Check":  "complete permitted-dependency graph is acyclic",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Direction",
+                       "Check":  "all dependencies point to a larger layer rank",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Direction",
+                       "Check":  "same-level dependencies and decisions are absent",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Ownership",
+                       "Check":  "every mutable resource has exactly one aligned owner",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Paths",
+                       "Check":  "existing component paths resolve and planned paths remain declared",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Candidates",
+                       "Check":  "obsolete BSP and rejected candidate artifacts are absent",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   },
+                   {
+                       "Category":  "Document",
+                       "Check":  "review-document state matches contract state",
+                       "Status":  "PASS",
+                       "Diagnostic":  ""
+                   }
+               ],
+    "OverallResult":  "PASS"
+}
