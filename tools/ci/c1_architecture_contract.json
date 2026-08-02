@@ -1,7 +1,7 @@
 {
     "schema_version":  2,
     "work_package":  "C1.3",
-    "status":  "Draft",
+    "status":  "Accepted",
     "gate":  "G-C",
     "parent_baseline":  "77407888f4b5758561168a4507294a939e518c7d",
     "parent_documents":  [
@@ -362,5 +362,5 @@
                                               "rationale":  "Platform services to HAL is downward, and device-drivers to HAL is an ordered hardware-abstraction sublayer dependency."
                                           }
                                       ],
-    "gate_status":  "PENDING_VERIFICATION"
+    "gate_status":  "ACCEPTED"
 }
