@@ -1,0 +1,85 @@
+{
+    "schema_version":  1,
+    "work_package":  "C2.2",
+    "status":  "Proposed",
+    "parent_baseline":  "d16f0d3223fa8d895f65837450acb346d3256b22",
+    "decision_record":  "docs/phase-c/architecture-decisions/ADR-0003_Shared_Status_Foundation_Contract.md",
+    "accepted_sources":  {
+                             "c1_1_document":  {
+                                                   "path":  "docs/phase-c/C1.1_System_Architecture.md",
+                                                   "blob":  "fc81cc613d1f403ca428305a57bc3a0cce065fef"
+                                               },
+                             "c1_2_document":  {
+                                                   "path":  "docs/phase-c/C1.2_Component_Interface_and_Runtime_Contracts.md",
+                                                   "blob":  "f450cb1c40a86fddfdfebf840dc24ba29b2c15a3"
+                                               },
+                             "c1_3_document":  {
+                                                   "path":  "docs/phase-c/C1.3_Architecture_Review_and_Gate.md",
+                                                   "blob":  "54e3e2998d088e042ddb0f99611acbb43aeed5a2"
+                                               },
+                             "c1_2_component_contract":  {
+                                                             "path":  "tools/ci/c1_2_component_contract.json",
+                                                             "blob":  "e75c73002745afadf8653920e4afc2fa42247373"
+                                                         },
+                             "c1_3_architecture_contract":  {
+                                                                "path":  "tools/ci/c1_architecture_contract.json",
+                                                                "blob":  "f399ae3f236fe8287ab6127ad76a26c17bb74de0"
+                                                            }
+                         },
+    "component_addition":  {
+                               "id":  "core",
+                               "path":  "components/core",
+                               "classification":  "neutral-foundation-contract",
+                               "implementation_status":  "header-only",
+                               "execution_model":  "compile-time-type-contract",
+                               "owns_mutable_state":  false,
+                               "api_ownership":  [
+                                                     "sqd_status_t",
+                                                     "SQD_STATUS_*"
+                                                 ],
+                               "permitted_dependencies":  [
+
+                                                          ]
+                           },
+    "dependency_additions":  [
+                                 {
+                                     "caller":  "board",
+                                     "target":  "core",
+                                     "direction":  "downward",
+                                     "same_level_exception":  false
+                                 }
+                             ],
+    "status_contract":  {
+                            "header":  "components/core/include/sqd_status.h",
+                            "type":  "sqd_status_t",
+                            "status_codes":  [
+                                                 "SQD_STATUS_OK",
+                                                 "SQD_STATUS_INVALID_ARGUMENT",
+                                                 "SQD_STATUS_INVALID_STATE",
+                                                 "SQD_STATUS_ALREADY_INITIALIZED",
+                                                 "SQD_STATUS_NOT_FOUND",
+                                                 "SQD_STATUS_BUSY",
+                                                 "SQD_STATUS_TIMEOUT",
+                                                 "SQD_STATUS_IO",
+                                                 "SQD_STATUS_INTEGRITY",
+                                                 "SQD_STATUS_AUTHORIZATION",
+                                                 "SQD_STATUS_NO_MEMORY",
+                                                 "SQD_STATUS_NOT_SUPPORTED",
+                                                 "SQD_STATUS_CANCELLED",
+                                                 "SQD_STATUS_INTERNAL"
+                                             ]
+                        },
+    "preservation_rules":  {
+                               "accepted_c1_sources_are_modified":  false,
+                               "accepted_contracts_are_modified":  false,
+                               "board_owned_status_type_forbidden":  true,
+                               "platform_owned_status_type_forbidden":  true,
+                               "public_esp_err_t_forbidden":  true,
+                               "core_runtime_state_forbidden":  true,
+                               "core_general_utility_role_forbidden":  true
+                           },
+    "verification":  {
+                         "script":  "tools/scripts/C2.2_Verify_Architecture_Prerequisite.ps1",
+                         "host_test":  "tools/ci/tests/test_c2_2_architecture.py"
+                     }
+}
