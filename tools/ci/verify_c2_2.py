@@ -955,26 +955,12 @@ def validate_repository(repo_root: Path, contract_path: Path) -> dict:
     for path in required_paths:
         require(path.is_file(), f"Missing C2.2 file: {path}")
 
-    ancestor = subprocess.run(
-        [
-            "git",
-            "merge-base",
-            "--is-ancestor",
-            EXPECTED_PARENT_BASELINE,
-            "HEAD",
-        ],
-        cwd=repo_root,
-        check=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-    require(
-        ancestor.returncode == 0,
-        "Repository HEAD does not descend from the C2.2 "
-        "architecture prerequisite.",
-    )
-
+    # Post-acceptance validation is content-based. C2.2 was accepted
+    # through a squash merge, so its prerequisite feature commit is
+    # intentionally absent from the ancestry of subsequent repository
+    # HEADs. The exact implementation hashes, accepted-source identities,
+    # configuration contract and historical-preservation checks below
+    # establish the accepted C2.2 state without feature-branch ancestry.
     contract = validate_contract(contract_path)
     validate_implementation_hashes(repo_root, contract)
     validate_public_interface(repo_root, contract)
