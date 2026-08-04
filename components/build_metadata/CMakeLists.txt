@@ -49,7 +49,7 @@ if(SQD_TARGET STREQUAL "")
 endif()
 set(SQD_HARDWARE_COMPATIBILITY "$ENV{SQD_HARDWARE_COMPATIBILITY}")
 if(SQD_HARDWARE_COMPATIBILITY STREQUAL "")
-    set(SQD_HARDWARE_COMPATIBILITY "heltec-wifi-lora-32-v3")
+    set(SQD_HARDWARE_COMPATIBILITY "heltec-wifi-lora-32-v3.2-htit-wb32laf")
 endif()
 
 configure_file("${CMAKE_CURRENT_LIST_DIR}/include/sqd_build_metadata_generated.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/sqd_build_metadata_generated.h" @ONLY)

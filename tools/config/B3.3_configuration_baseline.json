@@ -3,7 +3,7 @@
     "work_package":  "B3.3",
     "control":  "configuration-drift",
     "target":  "esp32s3",
-    "hardware_compatibility":  "heltec-wifi-lora-32-v3",
+    "hardware_compatibility":  "heltec-wifi-lora-32-v3.2-htit-wb32laf",
     "profiles":  [
                      "debug",
                      "validation",
@@ -24,7 +24,7 @@
     "controlled_files":  [
                              {
                                  "relative_path":  "sdkconfig.defaults",
-                                 "canonical_sha256":  "DD39E8CA716B18264662C73913C545449A33195059E5103765BB6371FEF0DE4B"
+                                 "canonical_sha256":  "2C96D26CB1B73A9E5ABDA325BADB3F0B4FA4EBD81F62E5E495BE4B3944F69BE1"
                              },
                              {
                                  "relative_path":  "sdkconfig.defaults.debug",

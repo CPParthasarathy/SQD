@@ -20,7 +20,7 @@ param(
 
     [string]$IdfPath = "D:\esp\v6.0.2\esp-idf",
 
-    [string]$HardwareCompatibility = "heltec-wifi-lora-32-v3"
+    [string]$HardwareCompatibility = "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 )
 
 Set-StrictMode -Version Latest

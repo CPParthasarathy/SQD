@@ -230,7 +230,7 @@ def validate_contract(path: Path) -> dict:
         contract.get("hardware"),
         "B4.3 hardware contract",
     )
-    if hardware.get("compatibility") != "heltec-wifi-lora-32-v3":
+    if hardware.get("compatibility") != "heltec-wifi-lora-32-v3.2-htit-wb32laf":
         raise VerificationError(
             "B4.3 hardware compatibility is incorrect."
         )

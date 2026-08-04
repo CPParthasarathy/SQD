@@ -27,7 +27,7 @@ else {
     $env:SQD_B33_EXPECTED_BRANCH.Trim()
 }
 $script:B33_Target = "esp32s3"
-$script:B33_HardwareCompatibility = "heltec-wifi-lora-32-v3"
+$script:B33_HardwareCompatibility = "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 
 function Get-B33Timestamp {
     [CmdletBinding()]

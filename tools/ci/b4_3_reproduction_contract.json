@@ -12,7 +12,7 @@
     "target": "esp32s3"
   },
   "hardware": {
-    "compatibility": "heltec-wifi-lora-32-v3",
+    "compatibility": "heltec-wifi-lora-32-v3.2-htit-wb32laf",
     "serial_baud": 115200,
     "serial_device_patterns": [
       "CP210x",

@@ -345,7 +345,7 @@ def self_test(contract: Path) -> None:
             profile="debug",
             source_repository="CPParthasarathy/SQD",
             source_commit="1" * 40,
-            hardware_compatibility="heltec-wifi-lora-32-v3",
+            hardware_compatibility="heltec-wifi-lora-32-v3.2-htit-wb32laf",
             idf_version="v6.0.2",
             idf_commit="2" * 40,
         )

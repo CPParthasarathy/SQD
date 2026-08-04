@@ -11,7 +11,7 @@ param(
 
     [string]$IdfPath = $env:IDF_PATH,
 
-    [string]$HardwareCompatibility = "heltec-wifi-lora-32-v3",
+    [string]$HardwareCompatibility = "heltec-wifi-lora-32-v3.2-htit-wb32laf",
 
     [switch]$ContractOnly
 )

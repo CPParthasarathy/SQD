@@ -1,0 +1,14 @@
+menu "SQD board support"
+
+config SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2
+    bool "Heltec WiFi LoRa 32 V3.2 HTIT-WB32LAF"
+    default n
+    help
+        Select the exact Heltec WiFi LoRa 32 V3.2
+        HTIT-WB32LAF board mapping.
+
+        This option has no implicit default. The board component
+        CMake contract fails the build unless exactly one
+        controlled SQD board selection is enabled.
+
+endmenu
