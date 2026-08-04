@@ -6,8 +6,7 @@
 #include "driver/gpio.h"
 #include "sqd_board.h"
 
-#define SQD_BOARD_HARDWARE_COMPATIBILITY_ID \
-    "heltec-wifi-lora-32-v3.2-htit-wb32laf"
+#define SQD_BOARD_HARDWARE_COMPATIBILITY_ID "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 
 typedef enum {
     SQD_BOARD_SIGNAL_OLED_SDA = 0,
@@ -36,9 +35,7 @@ typedef struct {
     bool defined;
 } sqd_board_pin_t;
 
-const sqd_board_pin_t *sqd_board_internal_get_pin(
-    sqd_board_signal_t signal
-);
+const sqd_board_pin_t *sqd_board_internal_get_pin(sqd_board_signal_t signal);
 
 bool sqd_board_internal_mapping_is_valid(void);
 

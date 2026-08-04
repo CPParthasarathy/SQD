@@ -251,7 +251,7 @@
                                  },
                                  {
                                      "path":  "components/board/include/sqd_board.h",
-                                     "sha256":  "23D1D102623CCE4B5CBAC3E413C6715E309AD4089657C40A52FAC1D15830A2A5"
+                                     "sha256":  "305F1669EC9A83476CA85F461D622D19186BDFA66EC0C8E6FF5EDF15ABB3085F"
                                  },
                                  {
                                      "path":  "components/board/Kconfig",
@@ -259,7 +259,7 @@
                                  },
                                  {
                                      "path":  "components/board/private/sqd_board_internal.h",
-                                     "sha256":  "0474751C85162ADA4276B43E30022FD4976EC3FA3351376FD367DD1CD4463344"
+                                     "sha256":  "48102B3C6A350EB5ECE914D373E023EA6800A8B2DECB90953F4385CC76A01F1F"
                                  },
                                  {
                                      "path":  "components/board/README.md",
@@ -267,11 +267,11 @@
                                  },
                                  {
                                      "path":  "components/board/sqd_board.c",
-                                     "sha256":  "062158E95FCAAF5F08EA3906AFF6A75958AB28F74F2711969B2AE353A834DC8A"
+                                     "sha256":  "45570F4BA1E0F8E51ED9CA7C4C35A6A6961943817E2EABCA3CB13BF85D3CC478"
                                  },
                                  {
                                      "path":  "components/board/sqd_board_mapping.c",
-                                     "sha256":  "322FAC15139D7D1546E38234BBBB3E1B71F93967529C9ED49012F7CFE5C577A2"
+                                     "sha256":  "2A8B85DC25305AB618289EC5F7E0135239EA63AFC00E354D2324CD4D75E9732D"
                                  },
                                  {
                                      "path":  "sdkconfig.defaults",

@@ -8,10 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum {
-    SQD_BOARD_REVISION_UNKNOWN = 0,
-    SQD_BOARD_REVISION_HELTEC_WIFI_LORA_32_V3_2 = 1
-} sqd_board_revision_t;
+typedef enum { SQD_BOARD_REVISION_UNKNOWN = 0, SQD_BOARD_REVISION_HELTEC_WIFI_LORA_32_V3_2 = 1 } sqd_board_revision_t;
 
 /**
  * Prepare every board-owned GPIO in the accepted fail-closed state.
@@ -30,9 +27,7 @@ sqd_status_t sqd_board_initialize(void);
 /**
  * Return the validated runtime board revision.
  */
-sqd_status_t sqd_board_get_revision(
-    sqd_board_revision_t *revision
-);
+sqd_status_t sqd_board_get_revision(sqd_board_revision_t *revision);
 
 /**
  * Enable or disable the active-low Vext peripheral power rail.
@@ -42,9 +37,7 @@ sqd_status_t sqd_board_set_vext_enabled(bool enabled);
 /**
  * Enable or disable the active-high battery divider.
  */
-sqd_status_t sqd_board_set_battery_measurement_enabled(
-    bool enabled
-);
+sqd_status_t sqd_board_set_battery_measurement_enabled(bool enabled);
 
 /**
  * Illuminate or extinguish the active-high user LED.

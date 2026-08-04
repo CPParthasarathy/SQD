@@ -180,28 +180,28 @@ EXPECTED_IMPLEMENTATION_HASHES = {
         "2ccdbb33ac55ae10b4fb8873effed529"
     ),
     "components/board/include/sqd_board.h": (
-        "23d1d102623cce4b5cbac3e413c6715e"
-        "309ad4089657c40a52fac1d15830a2a5"
+        "305f1669ec9a83476ca85f461d622d19"
+        "186bdfa66ec0c8e6ff5edf15abb3085f"
     ),
     "components/board/Kconfig": (
         "4bb1413276578a7db1b28fd3e8c70b1c"
         "c3a069bc7c9de8fc7ef5d8e2855bdd4a"
     ),
     "components/board/private/sqd_board_internal.h": (
-        "0474751c85162ada4276b43e30022fd4"
-        "976ec3fa3351376fd367dd1cd4463344"
+        "48102b3c6a350eb5ece914d373e023ea"
+        "6800a8b2decb90953f4385cc76a01f1f"
     ),
     "components/board/README.md": (
         "306305772c32ce4b0db77bcb2bbc315a"
         "d978dfde1a023752ec6d1f390aa2f29c"
     ),
     "components/board/sqd_board.c": (
-        "062158e95fcaaf5f08ea3906aff6a759"
-        "58ab28f74f2711969b2ae353a834dc8a"
+        "45570f4ba1e0f8e51ed9ca7c4c35a6a6"
+        "961943817e2eabca3cb13bf85d3cc478"
     ),
     "components/board/sqd_board_mapping.c": (
-        "322fac15139d7d1546e38234bbbb3e1b"
-        "71f93967529c9ed49012f7cfe5c577a2"
+        "2a8b85dc25305ab618289ec5f7e01352"
+        "39ea63afc00e354d2324cd4d75e9732d"
     ),
     "sdkconfig.defaults": (
         "2c96d26cb1b73a9e5abda325badb3f0b"
