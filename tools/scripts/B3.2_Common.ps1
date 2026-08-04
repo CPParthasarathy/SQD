@@ -9,7 +9,7 @@ $script:B32_DefaultRepoRoot = "D:\OneDrive\SQD"
 $script:B32_DefaultIdfPath = "D:\esp\v6.0.2\esp-idf"
 $script:B32_RequiredIdfVersionPattern = '^ESP-IDF v6\.0\.2(?:\b|$)'
 $script:B32_Profiles = @("debug", "validation", "production")
-$script:B32_DefaultHardwareCompatibility = "heltec-wifi-lora-32-v3"
+$script:B32_DefaultHardwareCompatibility = "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 
 function Get-B32Timestamp {
     [CmdletBinding()]
@@ -833,6 +833,7 @@ function Assert-B32GeneratedConfiguration {
         'CONFIG_IDF_TARGET="esp32s3"'
         "CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y"
         'CONFIG_ESPTOOLPY_FLASHSIZE="8MB"'
+        "CONFIG_SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2=y"
     )
 
     $ProfileRequired = @{

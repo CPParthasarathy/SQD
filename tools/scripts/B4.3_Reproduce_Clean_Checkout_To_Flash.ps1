@@ -39,7 +39,7 @@ $script:B43IdfCommit = "7101770dc6db2667b3c477cc31365dd1acd6db4e"
 $script:B43IdfVersion = "v6.0.2"
 $script:B43PythonVersion = "Python 3.11.15"
 $script:B43Target = "esp32s3"
-$script:B43HardwareCompatibility = "heltec-wifi-lora-32-v3"
+$script:B43HardwareCompatibility = "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 $script:B43CompatibilityBranch = "feat/b3.2-controlled-tooling"
 $script:B43RequiredSerialMarkers = @(
     "B1.2 minimal firmware started",

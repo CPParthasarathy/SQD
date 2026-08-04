@@ -1,0 +1,322 @@
+{
+    "schema_version":  1,
+    "work_package":  "C2.2",
+    "title":  "Board Support Implementation Contract",
+    "status":  "Proposed",
+    "platform":  "ESP32-S3FN8",
+    "toolchain":  "ESP-IDF 6.0.2",
+    "parent_baseline":  "1945dc8e983374b342dc4c77589a908fb403f984",
+    "accepted_sources":  {
+                             "c2_1_board_contract":  {
+                                                         "path":  "docs/phase-c/C2.1_Board_Pins_Revision_Detection.md",
+                                                         "blob":  "d26f3e00efc5b8b251766eba416d634c63f9c5ba"
+                                                     },
+                             "architecture_prerequisite":  {
+                                                               "commit":  "1945dc8e983374b342dc4c77589a908fb403f984",
+                                                               "contract":  "tools/ci/c2_2_architecture_amendment.json",
+                                                               "status_type":  "components/core/include/sqd_status.h"
+                                                           }
+                         },
+    "board_identity":  {
+                           "product":  "Heltec WiFi LoRa 32 V3.2",
+                           "reference_design":  "HTIT-WB32LAF_V3.2",
+                           "compatibility_id":  "heltec-wifi-lora-32-v3.2-htit-wb32laf",
+                           "revision_enum":  "SQD_BOARD_REVISION_HELTEC_WIFI_LORA_32_V3_2",
+                           "kconfig_symbol":  "SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2",
+                           "sdkconfig_selection":  "CONFIG_SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2=y"
+                       },
+    "public_interface":  {
+                             "header":  "components/board/include/sqd_board.h",
+                             "status_type":  "sqd_status_t",
+                             "revision_type":  "sqd_board_revision_t",
+                             "functions":  [
+                                               "sqd_board_prepare_safe_state",
+                                               "sqd_board_initialize",
+                                               "sqd_board_get_revision",
+                                               "sqd_board_set_vext_enabled",
+                                               "sqd_board_set_battery_measurement_enabled",
+                                               "sqd_board_set_user_led"
+                                           ],
+                             "forbidden_tokens":  [
+                                                      "gpio_num_t",
+                                                      "GPIO_NUM_",
+                                                      "driver/gpio.h",
+                                                      "esp_err_t",
+                                                      "SQD_BOARD_SIGNAL_"
+                                                  ]
+                         },
+    "private_mapping":  {
+                            "header":  "components/board/private/sqd_board_internal.h",
+                            "source":  "components/board/sqd_board_mapping.c",
+                            "signal_count":  17,
+                            "unique_gpio_required":  true,
+                            "complete_mapping_required":  true,
+                            "mappings":  [
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_OLED_SDA",
+                                                 "gpio":  17,
+                                                 "active_low":  false,
+                                                 "safe_state":  "released-open-drain-high"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_OLED_SCL",
+                                                 "gpio":  18,
+                                                 "active_low":  false,
+                                                 "safe_state":  "released-open-drain-high"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_OLED_RESET",
+                                                 "gpio":  21,
+                                                 "active_low":  true,
+                                                 "safe_state":  "asserted-low"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_NSS",
+                                                 "gpio":  8,
+                                                 "active_low":  true,
+                                                 "safe_state":  "deasserted-high"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_SCK",
+                                                 "gpio":  9,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input-before-spi"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_MOSI",
+                                                 "gpio":  10,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input-before-spi"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_MISO",
+                                                 "gpio":  11,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_RESET",
+                                                 "gpio":  12,
+                                                 "active_low":  true,
+                                                 "safe_state":  "deasserted-high"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_BUSY",
+                                                 "gpio":  13,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_LORA_DIO1",
+                                                 "gpio":  14,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_VEXT_CONTROL",
+                                                 "gpio":  36,
+                                                 "active_low":  true,
+                                                 "safe_state":  "deasserted-high-vext-disabled"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_USER_BUTTON",
+                                                 "gpio":  0,
+                                                 "active_low":  true,
+                                                 "safe_state":  "input-pullup"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_BATTERY_ADC",
+                                                 "gpio":  1,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input-divider-disabled"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_BATTERY_ADC_CONTROL",
+                                                 "gpio":  37,
+                                                 "active_low":  false,
+                                                 "safe_state":  "deasserted-low-divider-disabled"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_USER_LED",
+                                                 "gpio":  35,
+                                                 "active_low":  false,
+                                                 "safe_state":  "deasserted-low-led-off"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_UART0_TX",
+                                                 "gpio":  43,
+                                                 "active_low":  false,
+                                                 "safe_state":  "uart-defined"
+                                             },
+                                             {
+                                                 "signal":  "SQD_BOARD_SIGNAL_UART0_RX",
+                                                 "gpio":  44,
+                                                 "active_low":  false,
+                                                 "safe_state":  "input"
+                                             }
+                                         ]
+                        },
+    "safe_state":  {
+                       "source":  "components/board/sqd_board.c",
+                       "level_latched_before_direction":  true,
+                       "gpio0_output_forbidden":  true,
+                       "initialization_retains_vext_disabled":  true,
+                       "initialization_retains_battery_divider_disabled":  true,
+                       "initialization_retains_user_led_off":  true,
+                       "unknown_revision_fails_closed":  true,
+                       "gpio_failure_restores_safe_state":  true,
+                       "setter_before_initialization_status":  "SQD_STATUS_INVALID_STATE"
+                   },
+    "configuration":  {
+                          "kconfig":  {
+                                          "path":  "components/board/Kconfig",
+                                          "default_enabled":  false
+                                      },
+                          "cmake":  {
+                                        "path":  "components/board/CMakeLists.txt",
+                                        "exactly_one_selection_required":  true,
+                                        "requires":  [
+                                                         "core"
+                                                     ],
+                                        "private_requires":  [
+                                                                 "esp_driver_gpio"
+                                                             ]
+                                    },
+                          "common_defaults":  {
+                                                  "path":  "sdkconfig.defaults",
+                                                  "selection":  "CONFIG_SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2=y",
+                                                  "sha256":  "2C96D26CB1B73A9E5ABDA325BADB3F0B4FA4EBD81F62E5E495BE4B3944F69BE1"
+                                              },
+                          "generated_validation":  {
+                                                       "path":  "tools/scripts/B3.2_Common.ps1",
+                                                       "required_setting":  "CONFIG_SQD_BOARD_HELTEC_WIFI_LORA_32_V3_2=y"
+                                                   },
+                          "drift_baseline":  {
+                                                 "path":  "tools/config/B3.3_configuration_baseline.json",
+                                                 "controlled_relative_path":  "sdkconfig.defaults",
+                                                 "canonical_sha256":  "2C96D26CB1B73A9E5ABDA325BADB3F0B4FA4EBD81F62E5E495BE4B3944F69BE1"
+                                             }
+                      },
+    "build_propagation":  {
+                              "ci":  [
+                                         ".github/workflows/ci.yml",
+                                         "tools/ci/run_profile_build.ps1",
+                                         "tools/scripts/B3.2_Build.ps1",
+                                         "sdkconfig.defaults"
+                                     ],
+                              "clean_reproduction":  [
+                                                         "tools/scripts/B4.3_Reproduce_Clean_Checkout_To_Flash.ps1",
+                                                         "tools/scripts/B3.2_Build.ps1",
+                                                         "sdkconfig.defaults"
+                                                     ]
+                          },
+    "active_compatibility_paths":  [
+                                       ".github/workflows/ci.yml",
+                                       "components/build_metadata/CMakeLists.txt",
+                                       "tools/ci/artifact_archive.py",
+                                       "tools/ci/b4_3_reproduction_contract.json",
+                                       "tools/ci/run_profile_build.ps1",
+                                       "tools/ci/tests/test_artifact_archive.py",
+                                       "tools/ci/tests/test_b4_3_reproduction.py",
+                                       "tools/ci/verify_b4_3.py",
+                                       "tools/config/B3.3_configuration_baseline.json",
+                                       "tools/scripts/B2.3_Initialize_Metadata_Secrets.ps1",
+                                       "tools/scripts/B2.3_Verify_Metadata_Secrets.ps1",
+                                       "tools/scripts/B3.2_Bootstrap.ps1",
+                                       "tools/scripts/B3.2_Build.ps1",
+                                       "tools/scripts/B3.2_Common.ps1",
+                                       "tools/scripts/B3.2_Erase.ps1",
+                                       "tools/scripts/B3.2_Flash.ps1",
+                                       "tools/scripts/B3.2_HardwareCheck.ps1",
+                                       "tools/scripts/B3.2_Monitor.ps1",
+                                       "tools/scripts/B3.2_Recovery.ps1",
+                                       "tools/scripts/B3.2_Release.ps1",
+                                       "tools/scripts/B3.2_Verify.ps1",
+                                       "tools/scripts/B3.3_Common.ps1",
+                                       "tools/scripts/B4.3_Reproduce_Clean_Checkout_To_Flash.ps1"
+                                   ],
+    "historical_preservation":  {
+                                    "unchanged_prefixes":  [
+                                                               "docs/evidence/",
+                                                               "docs/phase-b/"
+                                                           ],
+                                    "unchanged_files":  [
+                                                            "docs/phase-c/C2.1_Board_Pins_Revision_Detection.md"
+                                                        ]
+                                },
+    "implementation_files":  [
+                                 {
+                                     "path":  "components/board/CMakeLists.txt",
+                                     "sha256":  "a1c0fab74d430d3659f129ee6e334d622ccdbb33ac55ae10b4fb8873effed529"
+                                 },
+                                 {
+                                     "path":  "components/board/include/sqd_board.h",
+                                     "sha256":  "305F1669EC9A83476CA85F461D622D19186BDFA66EC0C8E6FF5EDF15ABB3085F"
+                                 },
+                                 {
+                                     "path":  "components/board/Kconfig",
+                                     "sha256":  "4BB1413276578A7DB1B28FD3E8C70B1CC3A069BC7C9DE8FC7EF5D8E2855BDD4A"
+                                 },
+                                 {
+                                     "path":  "components/board/private/sqd_board_internal.h",
+                                     "sha256":  "48102B3C6A350EB5ECE914D373E023EA6800A8B2DECB90953F4385CC76A01F1F"
+                                 },
+                                 {
+                                     "path":  "components/board/README.md",
+                                     "sha256":  "306305772C32CE4B0DB77BCB2BBC315AD978DFDE1A023752EC6D1F390AA2F29C"
+                                 },
+                                 {
+                                     "path":  "components/board/sqd_board.c",
+                                     "sha256":  "45570F4BA1E0F8E51ED9CA7C4C35A6A6961943817E2EABCA3CB13BF85D3CC478"
+                                 },
+                                 {
+                                     "path":  "components/board/sqd_board_mapping.c",
+                                     "sha256":  "2A8B85DC25305AB618289EC5F7E0135239EA63AFC00E354D2324CD4D75E9732D"
+                                 },
+                                 {
+                                     "path":  "sdkconfig.defaults",
+                                     "sha256":  "2C96D26CB1B73A9E5ABDA325BADB3F0B4FA4EBD81F62E5E495BE4B3944F69BE1"
+                                 },
+                                 {
+                                     "path":  "tools/scripts/B3.2_Common.ps1",
+                                     "sha256":  "BF746F45AFF26BAB4CFBD43EC195D11B989A36F1C2C3FF5D0A08C9C3C17BF426"
+                                 },
+                                 {
+                                     "path":  "tools/config/B3.3_configuration_baseline.json",
+                                     "sha256":  "BC435E725C35FF78D37D46C4E01B064AE9A94C7F04AD82654A7AB7F5A510DFB2"
+                                 }
+                             ],
+    "verification_requirements":  [
+                                      "exact-board-compatibility-id",
+                                      "exact-public-revision-enum",
+                                      "neutral-public-interface",
+                                      "exact-seventeen-signal-private-map",
+                                      "exact-c2-1-gpio-values",
+                                      "valid-unique-gpio-map",
+                                      "gpio0-input-only-pullup",
+                                      "vext-and-battery-divider-disabled-after-initialize",
+                                      "user-led-off-after-initialize",
+                                      "lora-nss-and-reset-deasserted",
+                                      "oled-reset-asserted",
+                                      "oled-bus-open-drain-released",
+                                      "safe-level-before-direction",
+                                      "unknown-selection-fails-closed",
+                                      "setters-reject-before-initialize",
+                                      "gpio-failure-restores-safe-state",
+                                      "kconfig-default-n",
+                                      "common-default-explicit-board-selection",
+                                      "generated-sdkconfig-board-validation",
+                                      "b3-3-canonical-defaults-hash",
+                                      "ci-and-b4-3-defaults-propagation",
+                                      "active-compatibility-id-migration",
+                                      "historical-record-preservation",
+                                      "positive-and-mutation-negative-host-tests",
+                                      "esp-idf-board-component-build"
+                                  ],
+    "verification":  {
+                         "verifier":  "tools/ci/verify_c2_2.py",
+                         "host_test":  "tools/ci/tests/test_c2_2_board.py",
+                         "powershell_entrypoint":  "tools/scripts/C2.2_Verify_Board_Support.ps1",
+                         "implementation_record":  "docs/phase-c/C2.2_Board_Support_Implementation.md"
+                     }
+}

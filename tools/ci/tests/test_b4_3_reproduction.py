@@ -227,7 +227,7 @@ class B43ManifestTests(unittest.TestCase):
             "idf_version": "v6.0.2",
             "compiler_version": "test compiler",
             "hardware_compatibility": (
-                "heltec-wifi-lora-32-v3"
+                "heltec-wifi-lora-32-v3.2-htit-wb32laf"
             ),
             "secure_version": "0",
             "elf_sha256": "b" * 64,
@@ -270,7 +270,7 @@ class B43ManifestTests(unittest.TestCase):
                 "status": "PASS",
                 "port": "COM3",
                 "hardware_compatibility": (
-                    "heltec-wifi-lora-32-v3"
+                    "heltec-wifi-lora-32-v3.2-htit-wb32laf"
                 ),
                 "erase_status": "PASS",
                 "flash_status": "PASS",

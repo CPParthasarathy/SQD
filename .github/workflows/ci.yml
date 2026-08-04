@@ -190,7 +190,7 @@ jobs:
               -Profile "${{ matrix.profile }}" `
               -RepoRoot $env:GITHUB_WORKSPACE `
               -IdfPath $env:IDF_PATH `
-              -HardwareCompatibility "heltec-wifi-lora-32-v3"
+              -HardwareCompatibility "heltec-wifi-lora-32-v3.2-htit-wb32laf"
 
           if ($LASTEXITCODE -ne 0) {
               throw "Controlled profile build failed."

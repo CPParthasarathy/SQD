@@ -107,7 +107,7 @@ try {
         $env:IDF_TOOLS_PATH = $IDFToolsPath
         $env:ESP_IDF_VERSION = "6.0.2"
         $env:SQD_BUILD_PROFILE = "baseline"
-        $env:SQD_HARDWARE_COMPATIBILITY = "heltec-wifi-lora-32-v3"
+        $env:SQD_HARDWARE_COMPATIBILITY = "heltec-wifi-lora-32-v3.2-htit-wb32laf"
         . (Join-Path $IDFPath "export.ps1")
         $Python = Get-Command python.exe -ErrorAction Stop
         $script:PythonExe = $Python.Source
@@ -133,7 +133,7 @@ try {
         $Commit = Git-Capture @("rev-parse","HEAD")
         $Short = Git-Capture @("rev-parse","--short=12","HEAD")
         $Args = @($Inspector,"--binary",$Binary,"--manifest",$ManifestPath)
-        $Tokens = @("SQD_META_V1","version=$script:Version","git=$Commit","profile=baseline","target=esp32s3","hardware=heltec-wifi-lora-32-v3","compiler=","v6.0.2",$Short)
+        $Tokens = @("SQD_META_V1","version=$script:Version","git=$Commit","profile=baseline","target=esp32s3","hardware=heltec-wifi-lora-32-v3.2-htit-wb32laf","compiler=","v6.0.2",$Short)
         foreach ($Token in $Tokens) { $Args += @("--token",$Token) }
         & $script:PythonExe @Args
         if ($LASTEXITCODE -ne 0) { throw "Required provenance token is missing from the binary." }

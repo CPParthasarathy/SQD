@@ -215,7 +215,7 @@ class B42VerificationTests(unittest.TestCase):
             profile=profile,
             source_repository="CPParthasarathy/SQD",
             source_commit=source_commit,
-            hardware_compatibility="heltec-wifi-lora-32-v3",
+            hardware_compatibility="heltec-wifi-lora-32-v3.2-htit-wb32laf",
             idf_version="v6.0.2",
             idf_commit="2" * 40,
         )
